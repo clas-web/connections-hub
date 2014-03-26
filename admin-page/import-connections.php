@@ -1,7 +1,7 @@
 <?php
 
 
-class ConnectionsMainSite_AdminPage_ImportConnections
+class ConnectionsHub_AdminPage_ImportConnections
 {
 
 	/* */

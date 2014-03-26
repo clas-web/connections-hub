@@ -1,7 +1,7 @@
 <?php
 
 
-class ConnectionsMainSite_SynchConnection
+class ConnectionsHub_SynchConnection
 {
 	public static $last_error = '';
 

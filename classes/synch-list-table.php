@@ -7,7 +7,7 @@ if( !class_exists('WP_List_Table') )
 /**
  * 
  */
-class ConnectionsMainSite_AdminPage_SynchListTable extends WP_List_Table
+class ConnectionsHub_AdminPage_SynchListTable extends WP_List_Table
 {
 
 	private $_nonce_field;

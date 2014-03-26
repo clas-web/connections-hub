@@ -1,6 +1,6 @@
 <?php
 /*
-Plugin Name: Connections: Main Site
+Plugin Name: Connections Hub
 Plugin URI: 
 Description: 
 Version: 2.0.0
@@ -15,18 +15,18 @@ require_once( CONNECTIONS_PLUGIN_PATH.'/custom-post-type/connection.php' );
 
 if( is_admin() )
 {
-	add_action( 'admin_init', array('ConnectionsMainSite_Main', 'setup_actions') );
-	add_action( 'admin_menu', array('ConnectionsMainSite_Main', 'setup_admin_pages') );
+	add_action( 'admin_init', array('ConnectionsHub_Main', 'setup_actions') );
+	add_action( 'admin_menu', array('ConnectionsHub_Main', 'setup_admin_pages') );
 	
-	add_action("wp_ajax_connections-synch", array('ConnectionsMainSite_Main', 'show_admin_ajax_page'));
+	add_action("wp_ajax_connections-synch", array('ConnectionsHub_Main', 'show_admin_ajax_page'));
 }
 
 
 
 /**
- * The main class for the "Connections: Main Site" plugin.
+ * The main class for the "Connections Hub" plugin.
  */
-class ConnectionsMainSite_Main
+class ConnectionsHub_Main
 {
 
 	/**
@@ -40,7 +40,7 @@ class ConnectionsMainSite_Main
 	    	'Import',
 	    	'administrator', 
 	    	'connections-import-connections', 
-	    	array('ConnectionsMainSite_Main', 'show_admin_page')
+	    	array('ConnectionsHub_Main', 'show_admin_page')
 	    );
 
 	    add_submenu_page(
@@ -49,7 +49,7 @@ class ConnectionsMainSite_Main
 	    	'Synch',
 	    	'administrator', 
 	    	'connections-synch-connections', 
-	    	array('ConnectionsMainSite_Main', 'show_admin_page')
+	    	array('ConnectionsHub_Main', 'show_admin_page')
 	    );
 	}
 
@@ -60,8 +60,8 @@ class ConnectionsMainSite_Main
 	public static function show_admin_page()
 	{
 		require_once( CONNECTIONS_PLUGIN_PATH.'/admin-page.php' );
-		ConnectionsMainSite_AdminPage::init();
-		ConnectionsMainSite_AdminPage::show_page();
+		ConnectionsHub_AdminPage::init();
+		ConnectionsHub_AdminPage::show_page();
 	}
 	
 	
@@ -71,9 +71,9 @@ class ConnectionsMainSite_Main
 	public static function show_admin_ajax_page()
 	{
 		require_once( CONNECTIONS_PLUGIN_PATH.'/admin-ajax-page.php' );
-		ConnectionsMainSite_AdminAjaxPage::init();
-		ConnectionsMainSite_AdminAjaxPage::process();
-		ConnectionsMainSite_AdminAjaxPage::output();
+		ConnectionsHub_AdminAjaxPage::init();
+		ConnectionsHub_AdminAjaxPage::process();
+		ConnectionsHub_AdminAjaxPage::output();
 		exit();
 	}
 
@@ -84,8 +84,8 @@ class ConnectionsMainSite_Main
 	public static function setup_actions()
 	{
 		require_once( CONNECTIONS_PLUGIN_PATH.'/admin-page.php' );
-		ConnectionsMainSite_AdminPage::init();
-		ConnectionsMainSite_AdminPage::setup_actions();
+		ConnectionsHub_AdminPage::init();
+		ConnectionsHub_AdminPage::setup_actions();
 	}
 
 }

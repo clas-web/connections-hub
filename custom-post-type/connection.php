@@ -374,8 +374,9 @@ class Connections_ConnectionCustomPostType
 		if( !isset($_POST['sync']) ) return;
 		
 		require_once( CONNECTIONS_PLUGIN_PATH.'/classes/synch-connection.php' );
-		$synch_data = ConnectionsMainSite_SynchConnection::get_data($post_id);
-		ConnectionsMainSite_SynchConnection::synch($post_id, $synch_data);
+		$synch_data = ConnectionsHub_SynchConnection::get_data($post_id);
+		if( $synch_data !== false )
+			ConnectionsHub_SynchConnection::synch($post_id, $synch_data);
 	}
 
 

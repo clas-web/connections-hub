@@ -1,7 +1,7 @@
 <?php
 
 
-class ConnectionsMainSite_AdminPage_SynchConnections
+class ConnectionsHub_AdminPage_SynchConnections
 {
 
 	/* */
@@ -82,7 +82,7 @@ class ConnectionsMainSite_AdminPage_SynchConnections
 	{
 		self::init();
 		require_once( CONNECTIONS_PLUGIN_PATH.'/classes/synch-list-table.php' );
-		$synch_list_table = new ConnectionsMainSite_AdminPage_SynchListTable();
+		$synch_list_table = new ConnectionsHub_AdminPage_SynchListTable();
 		$synch_list_table->prepare_items(); 
 
 		?>		

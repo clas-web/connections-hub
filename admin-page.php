@@ -4,7 +4,7 @@
 /**
  * Processes, generates, and displays the plugin's admin page.
  */
-class ConnectionsMainSite_AdminPage
+class ConnectionsHub_AdminPage
 {
 
 	private static $_page;
@@ -42,7 +42,7 @@ class ConnectionsMainSite_AdminPage
 		}
 		
 		self::$_class = str_replace( '-', '', ucfirst(self::$_page) );
-		self::$_class = 'ConnectionsMainSite_AdminPage_'.self::$_class;
+		self::$_class = 'ConnectionsHub_AdminPage_'.self::$_class;
 	}
 	
 
@@ -65,7 +65,7 @@ class ConnectionsMainSite_AdminPage
 
 		require_once( CONNECTIONS_PLUGIN_PATH.'/admin-page/'.self::$_page.'.php' );
 		$class_name = str_replace(' ', '', ucwords( str_replace('-', ' ', self::$_page) ) );
-		$class_name = 'ConnectionsMainSite_AdminPage_'.$class_name;
+		$class_name = 'ConnectionsHub_AdminPage_'.$class_name;
 		add_action( 'admin_enqueue_scripts', array($class_name, 'enqueue_scripts') );
 		add_action( 'admin_head', array($class_name, 'add_head_script') );
 	}

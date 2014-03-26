@@ -5,7 +5,7 @@
 
 
 define( 'CONNECTIONS_DEBUG', true );
-define( 'CONNECTIONS_PLUGIN_NAME', 'Connections: Main Site' );
+define( 'CONNECTIONS_PLUGIN_NAME', 'Connections Hub' );
 define( 'CONNECTIONS_PLUGIN_PATH', dirname(__FILE__) );
 define( 'CONNECTIONS_PLUGIN_URL', plugins_url(basename(CONNECTIONS_PLUGIN_PATH)) );
 
