@@ -4,11 +4,17 @@
 /**
  * 
  */
-function connections_print( $text )
+function connections_print( $text, $label = null )
 {
 	echo '<pre>';
+	if( $label !== null ) var_dump($label);
 	var_dump($text);
 	echo '</pre>';
+}
+
+function connections_log( $text )
+{
+	file_put_contents( dirname(__FILE__).'/log.txt', print_r($text,true)."\n", FILE_APPEND );
 }
 
 
@@ -27,11 +33,11 @@ function connections_fix_url( $url )
 		}
 	}
 
-	$url = str_replace( 'https://', 'http://', $url );
-
-	if( strpos( $url, 'http://' ) === FALSE ) $url = 'http://'.$url;
-
-	if( substr($url,-1) !== '/' ) $url .= '/';
+// 	$url = str_replace( 'https://', 'http://', $url );
+// 
+// 	if( strpos( $url, 'http://' ) === FALSE ) $url = 'http://'.$url;
+// 
+// 	if( substr($url,-1) !== '/' ) $url .= '/';
 		
 	return $url;
 }
