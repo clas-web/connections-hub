@@ -41,6 +41,7 @@ class ConnectionsHub_AdminPage_SynchListTable extends WP_List_Table
 			array(
 				'post_type'   => 'connection',
 				'post_status' => 'publish',
+				'posts_per_page' => -1
 			)
 		);
 		
@@ -51,9 +52,9 @@ class ConnectionsHub_AdminPage_SynchListTable extends WP_List_Table
 			
 			$this->items[] = array(
 				'name'       => $post->post_title,
-				'url'        => get_post_meta( $post->ID, 'url', true ),
+				'url'        => connections_fix_url( get_post_meta( $post->ID, 'url', true ) ),
 				'site-type'  => get_post_meta( $post->ID, 'site-type', true ),
-				'synch-data' => get_post_meta( $post->ID, 'site-data' ),
+				'synch-data' => get_post_meta( $post->ID, 'synch-data', true ),
 				'post-id'    => $post->ID,
 			);
 		}
@@ -67,7 +68,6 @@ class ConnectionsHub_AdminPage_SynchListTable extends WP_List_Table
 	{
 		return array(
 			'name'   => 'Name',
-			'site'   => 'Site',
 			'synch'  => 'Synch Data',
 			'status' => 'Status'
 		);
@@ -119,7 +119,7 @@ class ConnectionsHub_AdminPage_SynchListTable extends WP_List_Table
 	 */
 	function column_default( $item, $column_name )
 	{
-		return print_r( $item, true ) ; //Show the whole array for troubleshooting purposes
+		return '<strong>ERROR:</strong><br/>'.$column_name;
 	}
 	
 
@@ -128,19 +128,16 @@ class ConnectionsHub_AdminPage_SynchListTable extends WP_List_Table
 	 */
 	function column_name( $item )
 	{
-		return $item['name'];
-	}
-	
+		$actions = array(
+            'edit' => sprintf( '<a href="%s" target="_blank">View</a>', get_permalink($item['post-id']) ),
+            'view' => sprintf( '<a href="%s" target="_blank">Edit</a>', get_edit_post_link($item['post-id']) ),
+        );
 
-	/**
-	 * 
-	 */
-	function column_site( $item )
-	{
 		$url = $item['url'];
 		$site_type = $item['site-type'];
 		
 		if( empty($url) ) $url = 'Invalid URL';
+		else $url = '<a href="'.$url.'" target="_blank">'.$url.'</a>';
 
 		switch($site_type)
 		{
@@ -149,7 +146,7 @@ class ConnectionsHub_AdminPage_SynchListTable extends WP_List_Table
 			default: $site_type = 'Unknown'; break;
 		}
 
-		return $url.'<br/>'.$site_type;	
+		return sprintf( '%1$s<br/>%2$s<strong>Site Url:</strong> %3$s<br/><strong>Site Type:</strong> %4$s', $item['name'],  $this->row_actions($actions), $url, $site_type );
 	}
 	
 
@@ -158,22 +155,7 @@ class ConnectionsHub_AdminPage_SynchListTable extends WP_List_Table
 	 */
 	function column_synch( $item )
 	{
-			$synch_data = $item['synch-data'];
-			
-			if( empty($synch_data) )
-			{
-				$synch_data = 'Never synched.';
-			}
-			else
-			{
-				$synch_data = '';
-				foreach( $synch_data as $key => $value )
-				{
-					$synch_data .= $key.': '.$value.'<br/>';
-				}
-			}
-			
-			return $synch_data;
+		return Connections_ConnectionCustomPostType::format_synch_data( $item['synch-data'] );
 	}
 	
 
