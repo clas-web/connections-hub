@@ -218,8 +218,6 @@ class Connections_ConnectionCustomPostType
 	 */
 	public static function add_meta_boxes()
 	{
-		wp_nonce_field( CONNECTIONS_PLUGIN_PATH, 'connection-custom-post-type-entry-form' );
-
 		add_meta_box(
 			'connections_info_box_imported_content',
 			'Imported Content',
@@ -242,7 +240,15 @@ class Connections_ConnectionCustomPostType
 			array( 'Connections_ConnectionCustomPostType', 'info_box_synch_data' ),
 			'connection',
 			'side',
-			'high'
+			'default'
+		);
+		add_meta_box(
+			'connections_info_box_contact_info',
+			'Contact Info',
+			array( 'Connections_ConnectionCustomPostType', 'info_box_contact_info' ),
+			'connection',
+			'side',
+			'default'
 		);
 	}
 	
@@ -252,6 +258,8 @@ class Connections_ConnectionCustomPostType
 	 */
 	public static function info_box_imported_content( $post )
 	{
+		wp_nonce_field( CONNECTIONS_PLUGIN_PATH, 'connection-custom-post-type-entry-form' );
+
 		$search_content = get_post_meta( $post->ID, 'search-content', true );
 
 		?>
@@ -300,27 +308,9 @@ class Connections_ConnectionCustomPostType
 	 */
 	public static function info_box_synch_data( $post )
 	{
-		$needs_synch = get_post_meta( $post->ID, 'needs-synch', true );
-		if( empty($needs_synch) ) $needs_synch = 'true';
-		$synch_data = get_post_meta( $post->ID, 'synch-data' );
-		
-		if( !empty($synch_data) )
-		{
-			$sd = '<br/>';
-			foreach( $synch_data as $key => $value )
-			{
-				$sd .= $key.': '.$value."<br/>";
-			}
-		}
-		else
-		{
-			$sd = 'Never synched';
-		}
-		
+		$synch_data = Connections_ConnectionCustomPostType::format_synch_data( get_post_meta($post->ID, 'synch-data', true) );
+		echo $synch_data; 
 		?>
-		Needs Synch: <?php echo $needs_synch; ?><br/>
-		Synch Data: <?php echo $sd; ?>
-
 
 		<div id="major-publishing-actions" style="margin:-12px;margin-top:10px;">
 
@@ -334,6 +324,17 @@ class Connections_ConnectionCustomPostType
 		</div>
 		
 		<?php
+	}
+	
+	
+	public static function info_box_contact_info( $post )
+	{
+		$contact_info = get_post_meta($post->ID, 'contact-info', true);
+		
+		if( empty($contact_info) )
+			$contact_info = 'No contact info.';
+			
+		echo $contact_info;
 	}
 	
 	
@@ -355,23 +356,24 @@ class Connections_ConnectionCustomPostType
 		if( !wp_verify_nonce($_POST['connection-custom-post-type-entry-form'], CONNECTIONS_PLUGIN_PATH) )
 			return;
 		
-
-		//var_dump($_POST);
-
+		$post_data = $_POST;
+		unset($_POST); // prevent looping...
 
 		//
 		// Save data
 		//
 		self::save_meta_data(
-			$_POST['connections-url'], 
-			$_POST['connections-username'], 
-			$_POST['connections-site-type']
+			$post_id,
+			$post_data['connections-url'], 
+			$post_data['connections-username'], 
+			$post_data['connections-site-type']
 		);
 		
 		//
 		// Synch content
 		//
-		if( !isset($_POST['sync']) ) return;
+		//echo '<pre>'; var_dump($_POST); echo '</pre>'; 
+		if( !isset($post_data['synch']) ) return;
 		
 		require_once( CONNECTIONS_PLUGIN_PATH.'/classes/synch-connection.php' );
 		$synch_data = ConnectionsHub_SynchConnection::get_data($post_id);
@@ -410,6 +412,13 @@ class Connections_ConnectionCustomPostType
 		{
 			update_post_meta( $post_id, 'needs-synch', 'false' );
 		}
+		
+		// set author
+		if( get_userdatabylogin($username) )
+		{
+			$user = get_user_by( 'slug', $username );
+			wp_update_post( array('ID' => $post_id, 'post_author' => $user->ID) );
+		}
 	}
 	
 	
@@ -431,7 +440,8 @@ class Connections_ConnectionCustomPostType
 	public static function all_connections_columns_key( $columns )
 	{
 		$columns['url'] = 'Source';
-		$columns['synch'] = 'Synch Data';
+		//$columns['synch'] = 'Synch Data';
+		unset($columns['taxonomy-'.self::$_tag_name]);
 		return $columns;
 	}
 	
@@ -451,7 +461,7 @@ class Connections_ConnectionCustomPostType
 				}
 				else
 				{
-					echo $url.'<br/>';
+					echo '<a href="'.$url.'" target="_blank">'.$url.'</a><br/>';
 				}
 				$site_type = get_post_meta( $post_id, 'site-type', true );
 				switch($site_type)
@@ -463,20 +473,33 @@ class Connections_ConnectionCustomPostType
 				break;
 
 			case 'synch':
-				$synch_data = get_post_meta( $post_id, 'site-data' );
-				if( empty($synch_data) )
-				{
-					echo 'Never synched';
-				}
-				else
-				{
-					foreach( $synch_data as $key => $value )
-					{
-						echo $key.': '.$value.'<br/>';
-					}
-				}
+				echo Connections_ConnectionCustomPostType::format_synch_data( get_post_meta($post_id, 'synch-data', true) );
 				break;
 		}
+	}
+	
+	
+	
+	public static function format_synch_data( $data )
+	{
+		$sd = '';
+		
+		if( empty($data) )
+		{
+			$sd = 'Never synched.';
+		}
+		else
+		{
+			foreach( $data as $key => $value )
+			{
+				if( ($key === 'view-url') && (!empty($value)) )
+					$value = '<a href="'.$value.'" target="_blank">'.$value.'</a>';
+				$key = ucwords( str_replace('-', ' ', $key) );
+				$sd .= '<strong>'.$key.':</strong> '.$value.'<br/>';
+			}
+		}
+		
+		return $sd;
 	}
 
 }
