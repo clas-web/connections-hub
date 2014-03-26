@@ -278,7 +278,7 @@ class ConnectionsHub_AdminPage_ImportConnections
 			//
 			// Save the Connections meta data ( url, username, site-type, needs-synch ).
 			//
-			Connections_ConnectionCustomPostType::save_meta_data( $post_id, $urow['url'], $username, $urow['site-type'] );
+			Connections_ConnectionCustomPostType::save_meta_data( $post_id, $urow['sort-title'], $urow['url'], $username, $urow['site-type'] );
 			if( $needs_synch ) update_post_meta( $post_id, 'needs-synch', 'true' );
 		}
 		

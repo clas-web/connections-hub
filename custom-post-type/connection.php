@@ -324,6 +324,7 @@ class Connections_ConnectionCustomPostType
 	 */
 	public static function info_box_connections_info( $post )
 	{
+		$sort_title = get_post_meta( $post->ID, 'sort-title', true );
 		$username = get_post_meta( $post->ID, 'username', true );
 		$url = get_post_meta( $post->ID, 'url', true );
 		$site_type = get_post_meta( $post->ID, 'site-type', true );
@@ -333,6 +334,9 @@ class Connections_ConnectionCustomPostType
 			$site_type = 'wp';
 		
 		?>
+		<label for="connections-sort-title">sort title</label><br/>
+		<input type="text" id="connections-sort-title" name="connections-sort-title" value="<?php echo esc_attr($sort_title); ?>" style="width:100%" /><br/>
+
 		<label for="connections-name">username</label><br/>
 		<input type="text" id="connections-username" name="connections-username" value="<?php echo esc_attr($username); ?>" style="width:100%" /><br/>
 
@@ -411,6 +415,7 @@ class Connections_ConnectionCustomPostType
 		//
 		self::save_meta_data(
 			$post_id,
+			$post_data['connections-sort-title'],
 			$post_data['connections-url'], 
 			$post_data['connections-username'], 
 			$post_data['connections-site-type']
@@ -432,11 +437,12 @@ class Connections_ConnectionCustomPostType
 	/**
 	 * 
 	 */
-	public static function save_meta_data( $post_id, $url, $username, $site_type )
+	public static function save_meta_data( $post_id, $sort_title, $url, $username, $site_type )
 	{
 		//
 		// Get current data
 		//
+		$meta_sort_title = get_post_meta( $post_id, 'sort-title', true );
 		$meta_username = get_post_meta( $post_id, 'username', true );
 		$meta_url = get_post_meta( $post_id, 'url', true );
 		$meta_site_type = get_post_meta( $post_id, 'site-type', true );
@@ -446,6 +452,7 @@ class Connections_ConnectionCustomPostType
 
 		
 		// Save data
+		update_post_meta( $post_id, 'sort-title', $sort_title );
 		update_post_meta( $post_id, 'username', $username );
 		update_post_meta( $post_id, 'url', $url );
 		update_post_meta( $post_id, 'site-type', $site_type );
