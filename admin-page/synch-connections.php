@@ -45,10 +45,8 @@ class ConnectionsHub_AdminPage_SynchConnections
 	 */
 	public static function enqueue_scripts()
 	{
-		wp_deregister_script('jquery');
-		wp_enqueue_script('jquery', 'http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js');
-		
-		wp_enqueue_script('syncher', CONNECTIONS_PLUGIN_URL.'/scripts/jquery.ajax.syncher.js');
+		wp_enqueue_script('jquery');
+		wp_enqueue_script('syncher', CONNECTIONS_PLUGIN_URL.'/scripts/jquery.ajax.syncher.js', array('jquery'));
 	}
 	
 	
@@ -60,8 +58,16 @@ class ConnectionsHub_AdminPage_SynchConnections
 		?>
 		<style>
 		
-			
-		
+			form.connections-synch-form .error {
+				color:red;
+			}
+			form.connections-synch-form .check-status {
+				padding-bottom:5px;
+			}
+			form.connections-synch-form .synch-status {
+				padding-top:5px;
+			}
+				
 		</style>
   		<script type="text/javascript">
 			jQuery(document).ready( function()
