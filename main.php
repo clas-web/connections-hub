@@ -12,6 +12,7 @@ Author URI: http://www.crystalbarton.com
 require_once( dirname(__FILE__).'/config.php' );
 require_once( CONNECTIONS_PLUGIN_PATH.'/util.php' );
 require_once( CONNECTIONS_PLUGIN_PATH.'/custom-post-type/connection.php' );
+require_once( CONNECTIONS_PLUGIN_PATH.'/random-spotlight-connections-widget.php' );
 
 if( is_admin() )
 {
