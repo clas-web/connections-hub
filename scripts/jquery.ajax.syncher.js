@@ -62,17 +62,15 @@ jQuery(document).ready(
 			})
 			.done(function( data )
 			{
-				alert(data);
-				
 				if( data['status'] == false )
 				{
 					$(form).children('div.check-status')
-						.html('Checking site...error.<br/>'+data['message']);
+						.html('Checking site...error.<br/><span class="error">'+data['message'])+'</span>';
 				}
 				else
 				{
 					$(form).children('div.check-status')
-						.html('Checking site...done.<br/>'+data['message']);
+						.html('Checking site...done.<br/><span class="notice">'+data['message'])+'</span>';
 				}
 			})
 			.fail(function( jqXHR, textStatus )
@@ -134,14 +132,15 @@ jQuery(document).ready(
 				if( data['status'] == false )
 				{
 					$(form).children('div.synch-status')
-						.html('Synching site...error.<br/>'+data['message']);
+						.html('Synching site...error.<br/><span class="error">'+data['message'])+'</span>';
 				}
 				else
 				{
 					$(form).children('div.synch-status')
-						.html('Synching site...done.<br/>'+data['message']);
+						.html('Synching site...done.<br/><span class="notice">'+data['message'])+'</span>';
 				}
 				
+				//alert( data['synch-data'] );
 				$(form).parent().parent().children('td.synch').html( data['synch-data'] );
 			})
 			.fail(function( jqXHR, textStatus )
