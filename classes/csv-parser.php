@@ -14,10 +14,10 @@ class Connections_CSVImporter
     	$headers = null;
 		$rows = array();
 		
-		$delimiter = ',';
-		$escape = ';';
 		$length = 99999;
-
+		$delimiter = ',';
+		$enclosure = '"';
+		$escape = '\\';
 
 		if( !file_exists($filename) )
 		{
@@ -33,8 +33,10 @@ class Connections_CSVImporter
         	return false;
 		}
 
-        while( $keys = fgetcsv($resource, $length, $delimiter, $escape) )
+        while( $keys = fgetcsv($resource, $length, $delimiter, $enclosure, $escape) )
         {
+			$keys = array_map( 'trim', $keys );
+
 			//file_put_contents( CONNECTIONS_PLUGIN_PATH.'/keys.txt', print_r($keys, true), FILE_APPEND );
 
 			if( $keys[0] === 'h' )
@@ -68,6 +70,7 @@ class Connections_CSVImporter
         }
 
         fclose( $resource );
+		//connections_print($rows, 'ROWS');
         return $rows;
     }
 
