@@ -90,19 +90,18 @@ class ConnectionsHub_SynchConnection
 		$search_content = preg_replace( '/  /', ' ', $search_content );
 		$search_content = preg_replace( '/\n\n+/', "\n", $search_content );
 		$search_content = preg_replace( '/(\r\n)(\r\n)+/', "\n", $search_content );
-		$search_content = explode( '\n', $search_content );
-		for( $i = 0; $i < count($search_content); $i++ )
-		{
-			$search_content[$i] = trim($search_content[$i]);
-			if( empty($search_content[$i]) )
-			{
-				$search_content[$i] = 'need to remove';
-				//array_splice( $search_content, $i, 1 );
-				//$i--;
-			}
-		}
-		$search_content = implode( '\n', $search_content );
-
+// 		$search_content = explode( '\n', $search_content );
+// 		for( $i = 0; $i < count($search_content); $i++ )
+// 		{
+// 			$search_content[$i] = trim($search_content[$i]);
+// 			if( empty($search_content[$i]) )
+// 			{
+// 				$search_content[$i] = 'need to remove';
+// 				//array_splice( $search_content, $i, 1 );
+// 				//$i--;
+// 			}
+// 		}
+// 		$search_content = implode( '\n', $search_content );
 // 		$search_content = htmlentities2utf8( $content );
 
 		$synch_data = array(
@@ -128,6 +127,7 @@ class ConnectionsHub_SynchConnection
 			$contact_info = $data['contact-info'];
 			unset($data['contact-info']);
 		}
+
 
 		wp_update_post( array( 'ID' => $connection_post_id, 'post_content' => $content ) );
 		update_post_meta( $connection_post_id, 'search-content', $search_content );
