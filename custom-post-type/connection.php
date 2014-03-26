@@ -21,11 +21,7 @@ add_action( 'manage_connection_posts_custom_column', array( 'Connections_Connect
 class Connections_ConnectionCustomPostType
 {
 
-	protected static $_category_name = 'connection-group';
-	protected static $_tag_name = 'connection-link';
-	
-	protected static $_category_slug = 'connection-group';
-	protected static $_tag_slug = 'connection-link';
+	protected static $_settings = null;
 
 	/**
 	 * Constructor.
@@ -35,52 +31,101 @@ class Connections_ConnectionCustomPostType
 	private function __construct() { }
 
 
+	public static function change_slugs() {}
+
+	public static function get_settings( $refresh = false )
+	{
+		if( self::$_settings !== null && !$refresh ) return self::$_settings;
+		
+		$default = array(
+			'name' => array(
+				'connection' => array(
+					'full_single' => 'Connection',
+					'full_plural' => 'Connections',
+					'short_single' => 'Connection',
+					'short_plural' => 'Connections',
+					'slug' => 'connection',
+				),
+				'group' => array(
+					'full_single' => 'Connection Group',
+					'full_plural' => 'Connection Groups',
+					'short_single' => 'Group',
+					'short_plural' => 'Groups',
+					'slug' => 'connection-group',
+				),
+				'link' => array(
+					'full_single' => 'Connection Link',
+					'full_plural' => 'Connection Links',
+					'short_single' => 'Link',
+					'short_plural' => 'Links',
+					'slug' => 'connection-link',
+				),
+			),
+		);
+
+		$settings = get_option( 'connections_hub_settings', $default );
+// 		ns_print($settings, 'get_settings');
+		$settings = array_merge($default, $settings);
+// 		$settings = $default;
+		
+		self::$_settings = $settings;
+		return $settings;
+	}
+
 	/**
 	 * Creates the custom Connection post type.
 	 */	
 	public static function create_custom_post()
 	{
+		$settings = self::get_settings();
+// 		ns_print($settings);
+		
+		extract( $settings['name']['connection'] );
+		
 		$labels = array(
-			'name'               => 'Connections',
-			'singular_name'      => 'Connection',
+			'name'               => $full_plural,
+			'singular_name'      => $full_single,
 			'add_new'            => 'Add New',
-			'add_new_item'       => 'Add New Connection',
-			'edit_item'          => 'Edit Connection',
-			'new_item'           => 'New Connection',
-			'all_items'          => 'All Connections',
-			'view_item'          => 'View Connection',
-			'search_items'       => 'Search Connections',
-			'not_found'          => 'No Connections found',
-			'not_found_in_trash' => 'No Connections found in the Trash',
+			'add_new_item'       => "Add New $full_single",
+			'edit_item'          => "Edit $full_single",
+			'new_item'           => "New $full_single",
+			'all_items'          => "All $full_plural",
+			'view_item'          => "View $full_plural",
+			'search_items'       => "Search $full_plural",
+			'not_found'          => "No $full_plural found",
+			'not_found_in_trash' => "No $full_plural found in the Trash",
 			'parent_item_colon'  => '',
-			'menu_name'          => 'Connections'
+			'menu_name'          => $short_plural,
 		);
 		
 		$args = array(
 			'labels'        => $labels,
-			'description'   => 'Holds our Connections data',
+			'description'   => "Holds our $full_plural data",
 			'public'        => true,
 			'menu_position' => 5,
 			'supports'      => array( 'title' ),
-			'taxonomies'    => array(), //array( 'category', 'post_tag' ),
+			'taxonomies'    => array(),
+			'rewrite'       => array( 'slug' => $slug ),
 			'has_archive'   => true,
 		);
 		
 		register_post_type( 'connection', $args );
 
+		extract( $settings['name']['group'] );
+
 		// Add new taxonomy, make it hierarchical (like categories)
 		$labels = array(
-			'name'              => 'Connection Groups',
-			'singular_name'     => 'Connection Group',
-			'search_items'      => 'Search Connection Groups',
-			'all_items'         => 'All Connection Groups',
-			'parent_item'       => 'Parent Group',
-			'parent_item_colon' => 'Parent Group:',
-			'edit_item'         => 'Edit Group',
-			'update_item'       => 'Update Group',
-			'add_new_item'      => 'Add New Group',
-			'new_item_name'     => 'New Group Name',
-			'menu_name'         => 'Groups',
+			'name'              => $full_plural,
+			'singular_name'     => $full_single,
+			'search_items'      => "Search $full_plural",
+			'all_items'         => "All $full_plural",
+			'parent_item'       => "Parent $short_single",
+			'parent_item_colon' => "Parent $short_single:",
+			'edit_item'         => "Edit $short_single",
+			'update_item'       => "Update $short_single",
+			'add_new_item'      => "Add New $short_single",
+			'new_item_name'     => "New $short_single Name",
+			'menu_name'         => $short_plural,
 		);
 
 		$args = array(
@@ -89,29 +134,31 @@ class Connections_ConnectionCustomPostType
 			'show_ui'           => true,
 			'show_admin_column' => true,
 			'query_var'         => true,
-			'rewrite'           => array( 'slug' => self::$_category_slug ),
+			'rewrite'           => array( 'slug' => $slug ),
 		);
 
-		register_taxonomy( self::$_category_name, array( 'connection' ), $args );
+		register_taxonomy( 'connection-group', array( 'connection' ), $args );
+
+		extract( $settings['name']['link'] );
 
 		// Add new taxonomy, NOT hierarchical (like tags)
 		$labels = array(
-			'name'                       => 'Connection Links',
-			'singular_name'              => 'Connection Link',
-			'search_items'               => 'Search Connection Links',
-			'popular_items'              => 'Popular Connection Links',
-			'all_items'                  => 'All Connection Links',
+			'name'                       => $full_plural,
+			'singular_name'              => $full_single,
+			'search_items'               => "Search $full_plural",
+			'popular_items'              => "Popular $full_plural",
+			'all_items'                  => "All $full_plural",
 			'parent_item'                => null,
 			'parent_item_colon'          => null,
-			'edit_item'                  => 'Edit Link',
-			'update_item'                => 'Update Link',
-			'add_new_item'               => 'Add New Link',
-			'new_item_name'              => 'New Link Name',
-			'separate_items_with_commas' => 'Separate Link with commas',
-			'add_or_remove_items'        => 'Add or remove Link',
-			'choose_from_most_used'      => 'Choose from the most used Link',
-			'not_found'                  => 'No Link found.',
-			'menu_name'                  => 'Links',
+			'edit_item'                  => "Edit $short_single",
+			'update_item'                => "Update $short_single",
+			'add_new_item'               => "Add New $short_single",
+			'new_item_name'              => "New $short_single Name",
+			'separate_items_with_commas' => "Separate $short_single with commas",
+			'add_or_remove_items'        => "Add or remove $short_single",
+			'choose_from_most_used'      => "Choose from the most used $short_single",
+			'not_found'                  => "No $short_single found.",
+			'menu_name'                  => $short_plural,
 		);
 
 		$args = array(
@@ -121,10 +168,10 @@ class Connections_ConnectionCustomPostType
 			'show_admin_column'     => true,
 			'update_count_callback' => '_update_post_term_count',
 			'query_var'             => true,
-			'rewrite'               => array( 'slug' => self::$_tag_slug ),
+			'rewrite'               => array( 'slug' => $slug ),
 		);
 
-		register_taxonomy( self::$_tag_name, 'connection', $args );
+		register_taxonomy( 'connection-link', 'connection', $args );
 
 		/*				
 		// Add new taxonomy, make it hierarchical (like categories)
@@ -441,7 +488,7 @@ class Connections_ConnectionCustomPostType
 	{
 		$columns['url'] = 'Source';
 		//$columns['synch'] = 'Synch Data';
-		unset($columns['taxonomy-'.self::$_tag_name]);
+		unset($columns['taxonomy-connection-link']);
 		return $columns;
 	}
 	

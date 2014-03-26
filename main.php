@@ -52,6 +52,15 @@ class ConnectionsHub_Main
 	    	'connections-synch-connections', 
 	    	array('ConnectionsHub_Main', 'show_admin_page')
 	    );
+
+	    add_submenu_page(
+	    	'edit.php?post_type=connection', 
+	    	'Connections Settings Page', 
+	    	'Settings',
+	    	'administrator', 
+	    	'connections-settings', 
+	    	array('ConnectionsHub_Main', 'show_admin_page')
+	    );
 	}
 
 

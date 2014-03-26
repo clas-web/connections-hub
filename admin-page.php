@@ -30,6 +30,7 @@ class ConnectionsHub_AdminPage
 			{
 				case 'connections-synch-connections':
 				case 'connections-import-connections':
+				case 'connections-settings':
 					self::$_page = substr($_GET['page'], 12); break;
 
 				default:
