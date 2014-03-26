@@ -18,9 +18,14 @@ add_filter( 'manage_edit-connection_columns', array( 'Connections_ConnectionCust
 add_action( 'manage_connection_posts_custom_column', array( 'Connections_ConnectionCustomPostType', 'all_connections_columns_value' ), 10, 2 );
 
 
-
 class Connections_ConnectionCustomPostType
 {
+
+	protected static $_category_name = 'connection-group';
+	protected static $_tag_name = 'connection-link';
+	
+	protected static $_category_slug = 'connection-group';
+	protected static $_tag_slug = 'connection-link';
 
 	/**
 	 * Constructor.
@@ -42,7 +47,7 @@ class Connections_ConnectionCustomPostType
 			'add_new_item'       => 'Add New Connection',
 			'edit_item'          => 'Edit Connection',
 			'new_item'           => 'New Connection',
-			'all_items'          => 'All Connection',
+			'all_items'          => 'All Connections',
 			'view_item'          => 'View Connection',
 			'search_items'       => 'Search Connections',
 			'not_found'          => 'No Connections found',
@@ -57,11 +62,131 @@ class Connections_ConnectionCustomPostType
 			'public'        => true,
 			'menu_position' => 5,
 			'supports'      => array( 'title' ),
-			'taxonomies'    => array( 'category', 'post_tag' ),
+			'taxonomies'    => array(), //array( 'category', 'post_tag' ),
 			'has_archive'   => true,
 		);
 		
-		register_post_type( 'connection', $args );	
+		register_post_type( 'connection', $args );
+
+		// Add new taxonomy, make it hierarchical (like categories)
+		$labels = array(
+			'name'              => 'Connection Groups',
+			'singular_name'     => 'Connection Group',
+			'search_items'      => 'Search Connection Groups',
+			'all_items'         => 'All Connection Groups',
+			'parent_item'       => 'Parent Group',
+			'parent_item_colon' => 'Parent Group:',
+			'edit_item'         => 'Edit Group',
+			'update_item'       => 'Update Group',
+			'add_new_item'      => 'Add New Group',
+			'new_item_name'     => 'New Group Name',
+			'menu_name'         => 'Groups',
+		);
+
+		$args = array(
+			'hierarchical'      => true,
+			'labels'            => $labels,
+			'show_ui'           => true,
+			'show_admin_column' => true,
+			'query_var'         => true,
+			'rewrite'           => array( 'slug' => self::$_category_slug ),
+		);
+
+		register_taxonomy( self::$_category_name, array( 'connection' ), $args );
+
+		// Add new taxonomy, NOT hierarchical (like tags)
+		$labels = array(
+			'name'                       => 'Connection Links',
+			'singular_name'              => 'Connection Link',
+			'search_items'               => 'Search Connection Links',
+			'popular_items'              => 'Popular Connection Links',
+			'all_items'                  => 'All Connection Links',
+			'parent_item'                => null,
+			'parent_item_colon'          => null,
+			'edit_item'                  => 'Edit Link',
+			'update_item'                => 'Update Link',
+			'add_new_item'               => 'Add New Link',
+			'new_item_name'              => 'New Link Name',
+			'separate_items_with_commas' => 'Separate Link with commas',
+			'add_or_remove_items'        => 'Add or remove Link',
+			'choose_from_most_used'      => 'Choose from the most used Link',
+			'not_found'                  => 'No Link found.',
+			'menu_name'                  => 'Links',
+		);
+
+		$args = array(
+			'hierarchical'          => false,
+			'labels'                => $labels,
+			'show_ui'               => true,
+			'show_admin_column'     => true,
+			'update_count_callback' => '_update_post_term_count',
+			'query_var'             => true,
+			'rewrite'               => array( 'slug' => self::$_tag_slug ),
+		);
+
+		register_taxonomy( self::$_tag_name, 'connection', $args );
+
+		/*				
+		// Add new taxonomy, make it hierarchical (like categories)
+		$labels = array(
+			'name'              => 'Connection Categories',
+			'singular_name'     => 'Connection Category',
+			'search_items'      => 'Search Connection Categories',
+			'all_items'         => 'All Connection Categories',
+			'parent_item'       => 'Parent Connection Category',
+			'parent_item_colon' => 'Parent Connection Category:',
+			'edit_item'         => 'Edit Connection Category',
+			'update_item'       => 'Update Connection Category',
+			'add_new_item'      => 'Add New Connection Category',
+			'new_item_name'     => 'New Connection Category Name',
+			'menu_name'         => 'Connection Categories',
+		);
+
+		$args = array(
+			'hierarchical'      => true,
+			'labels'            => $labels,
+			'show_ui'           => true,
+			'show_admin_column' => true,
+			'query_var'         => true,
+			'rewrite'           => array( 'slug' => 'connection-category' ),
+		);
+
+		register_taxonomy( 'connection-category', array( 'connection' ), $args );
+
+		// Add new taxonomy, NOT hierarchical (like tags)
+		$labels = array(
+			'name'                       => 'Connection Tag',
+			'singular_name'              => 'Connection Tags',
+			'search_items'               => 'Search Connection Tags',
+			'popular_items'              => 'Popular Connection Tags',
+			'all_items'                  => 'All Connection Tags',
+			'parent_item'                => 'Parent Connection Tag',
+			'parent_item_colon'          => 'Parent Connection Tag:',
+			'edit_item'                  => 'Edit Connection Tag',
+			'update_item'                => 'Update Connection Tag',
+			'add_new_item'               => 'Add New Connection Tag',
+			'new_item_name'              => 'New Connection Tag Name',
+			'separate_items_with_commas' => 'Separate Connection Tags with commas',
+			'add_or_remove_items'        => 'Add or remove Connection Tags',
+			'choose_from_most_used'      => 'Choose from the most used Connection Tags',
+			'not_found'                  => 'No Connection Tags found.',
+			'menu_name'                  => 'Connection Tags',
+		);
+
+		$args = array(
+			'hierarchical'          => false,
+			'labels'                => $labels,
+			'show_ui'               => true,
+			'show_admin_column'     => true,
+			'update_count_callback' => '_update_post_term_count',
+			'query_var'             => true,
+			'rewrite'               => array( 'slug' => 'connection-tag' ),
+		);
+
+		register_taxonomy( 'connetions-tag', 'connection', $args );
+		*/
+
+		flush_rewrite_rules(false);
 	}
 	
 	

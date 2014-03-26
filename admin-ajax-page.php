@@ -1,7 +1,7 @@
 <?php
 
 
-class ConnectionsMainSite_AdminAjaxPage
+class ConnectionsHub_AdminAjaxPage
 {
 	private static $_output;
 
@@ -73,20 +73,22 @@ class ConnectionsMainSite_AdminAjaxPage
 			return false;
 		}
 		
+		//connections_print( $_POST );
+		
 		require_once( CONNECTIONS_PLUGIN_PATH.'/classes/synch-connection.php' );
-		$synch_data = ConnectionsMainSite_SynchConnection::get_data( $_POST['id'] );
+		$synch_data = ConnectionsHub_SynchConnection::get_data( $_POST['id'] );
 		if( $synch_data === false )
 		{
 			self::$_output = array(
 				'status' => false,
-				'message' => ConnectionsMainSite_SynchConnection::$last_error,
+				'message' => ConnectionsHub_SynchConnection::$last_error,
 			);
 			return false;
 		}
 		
 		self::$_output = array(
 			'status' => true,
-			'message' => '',
+			'message' => ''
 		);
 		
 		if( $return_data ) return $synch_data;
@@ -99,10 +101,16 @@ class ConnectionsMainSite_AdminAjaxPage
 	 */
 	private static function synch_site()
 	{
-		$result = self::check_site( true );
-		if( $result === false ) return;
+		$synch_data = self::check_site( true );
+		if( $synch_data === false ) return;
+
+		ConnectionsHub_SynchConnection::synch( $_POST['id'], $synch_data );
 		
-		ConnectionsMainSite_SynchConnection::synch( $_POST['id'], $result );
+		self::$_output = array(
+			'status' => true,
+			'message' => '',
+			'synch-data' => Connections_ConnectionCustomPostType::format_synch_data( $synch_data ),
+		);
 	}
 
 }

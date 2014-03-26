@@ -142,6 +142,11 @@ class ConnectionsMainSite_AdminPage_ImportConnections
 	{
 		global $wpdb;
 		$wpdb->delete( $wpdb->posts, array('post_type' => 'connection') );
+		$terms = get_terms( 'connection-group' );
+		foreach( $terms as $term )
+		{
+			wp_delete_term( $term->term_id, 'connection-group' );
+		}
 	}
 	
 	
@@ -201,6 +206,8 @@ class ConnectionsMainSite_AdminPage_ImportConnections
 			$urow = $urows[0];
 			$needs_synch = true;
 
+			//connections_print( $urow, 'UROW' );
+			
 			//
 			// Set defaults for the Connection post.
 			//
@@ -230,6 +237,18 @@ class ConnectionsMainSite_AdminPage_ImportConnections
 					'meta_value' => $username,
 				)
 			);
+
+			//
+			// Set the Connection groups and links.
+			//
+			$taxonomy_terms = array();
+			foreach( $urows as $ur )
+			{
+				$taxonomy_terms = array_merge_recursive( $taxonomy_terms, self::get_taxonomies($ur) );
+			}
+			
+			if( !empty($taxonomy_terms) )
+				$connections_post['tax_input'] = $taxonomy_terms;
 			
 			if( $wpquery->have_posts() )
 			{
@@ -255,15 +274,6 @@ class ConnectionsMainSite_AdminPage_ImportConnections
 				self::$error_messages[] = 'Unable to import site: '.$username;
 				continue;
 			}
-			
-			//
-			// Set the Connection categories.
-			//
-			$categories = array();
-			foreach( $urows as $ur )
-				$categories[] = $ur['category'];
-			$categories = csv_importer_create_or_get_categories($categories);
-			wp_set_post_categories( $post_id, $categories['post'] );
 			
 			//
 			// Save the Connections meta data ( url, username, site-type, needs-synch ).
@@ -333,6 +343,99 @@ class ConnectionsMainSite_AdminPage_ImportConnections
 		
 		$rows = $urows;
 	}
+	
+	
+	
+	/**
+     * Parse taxonomy data from the file
+     *
+     * array(
+     *      // hierarchical taxonomy name => ID array
+     *      'my taxonomy 1' => array(1, 2, 3, ...),
+     *      // non-hierarchical taxonomy name => term names string
+     *      'my taxonomy 2' => array('term1', 'term2', ...),
+     * )
+     *
+     * @param array $data
+     * @return array
+     */
+    private static function get_taxonomies( $data )
+    {
+        $taxonomies = array();
+        foreach ($data as $k => $v) 
+        {
+            if( preg_match('/^taxonomy-(.*)$/', $k, $matches) ) 
+            {
+                $tax_name = $matches[1];
+               	$taxonomy = get_taxonomy( $tax_name );
+
+				if( $taxonomy === false )
+				{
+                    $this->log['error'][] = "Unknown taxonomy: '$tax_name'";
+                    continue;
+				}
+				
+				$taxonomies[$tax_name] = self::create_terms( $tax_name, $data[$k] );
+            }
+        }
+        return $taxonomies;
+    }
+
+
+
+    /**
+     * Return an array of term IDs for hierarchical taxonomies or the original
+     * string from CSV for non-hierarchical taxonomies. The original string
+     * should have the same format as csv_post_tags.
+     *
+     * @param string $taxonomy
+     * @param string $field
+     * @return mixed
+     */
+    private static function create_terms( $taxonomy_name, $fields )
+    {
+ 		$terms = array_map( 'trim', explode(',', $fields) );
+
+		if( is_taxonomy_hierarchical($taxonomy_name) )
+        {
+            $term_ids = array();
+            
+            foreach( $terms as $term )
+            {
+		 		$heirarchy = array_map( 'trim', explode('>', $term) );
+            	
+            	$parent = null;
+            	for( $i = 0; $i < count($heirarchy); $i++ )
+            	{
+            		if( !term_exists($heirarchy[$i], $taxonomy_name, $parent) )
+            		{
+            			$args = array();
+            			if( $parent ) $args['parent'] = $parent;
+            			
+            			$result = wp_insert_term( $heirarchy[$i], $taxonomy_name, $args );
+            			if( is_wp_error($result) )
+            			{
+            				$this->log['error'][] = 'Unable to insert '.$taxonomy_name.'term: '.$heirarchy[$i];
+            				break;
+            			}
+            		}
+            		
+            		$term_object = get_term_by( 'name', $heirarchy[$i], $taxonomy_name );
+            		if( is_wp_error($term_object) )
+            		{
+           				$this->log['error'][] = 'Invalid '.$taxonomy_name.'term: '.$heirarchy[$i];
+           				break;
+            		}
+
+            		$term_ids[] = $term_object->term_id;
+            	}
+            }
+        
+            return $term_ids;
+        }
+
+		return $terms;
+    }
 
 }
 
