@@ -137,7 +137,7 @@ class Connections_ConnectionCustomPostType
 			'rewrite'           => array( 'slug' => $slug ),
 		);
 
-		register_taxonomy( 'connection-group', array( 'connection' ), $args );
+		register_taxonomy( 'connection-group', 'connection', $args );
 
 		extract( $settings['name']['link'] );
 
@@ -233,7 +233,7 @@ class Connections_ConnectionCustomPostType
 		register_taxonomy( 'connetions-tag', 'connection', $args );
 		*/
 
-		flush_rewrite_rules(false);
+		flush_rewrite_rules();
 	}
 	
 	

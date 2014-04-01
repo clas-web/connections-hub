@@ -4,7 +4,7 @@
 //error_reporting(E_ERROR | E_WARNING | E_PARSE | E_NOTICE);
 
 
-define( 'CONNECTIONS_DEBUG', true );
+define( 'CONNECTIONS_DEBUG', false );
 define( 'CONNECTIONS_PLUGIN_NAME', 'Connections Hub' );
 define( 'CONNECTIONS_PLUGIN_PATH', dirname(__FILE__) );
 define( 'CONNECTIONS_PLUGIN_URL', plugins_url(basename(CONNECTIONS_PLUGIN_PATH)) );
