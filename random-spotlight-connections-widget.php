@@ -38,7 +38,7 @@ class ConnectionsHub_RandomSpotlightConnectionsWidget extends WP_Widget
 		if( !empty($instance['title']) )
 			echo $args['before_title'].$instance['title'].$args['after_title'];
 
-		$tags = get_terms( 'post_tag', array('orderby' => 'count', 'order' => 'DESC') );
+		$tags = get_terms( 'connection-link', array('orderby' => 'count', 'order' => 'DESC') );
 		$number_of_spotlights = intval($instance['number-of-spotlights']);
 		$spotlight_tags = array();
 		
@@ -146,6 +146,9 @@ class ConnectionsHub_RandomSpotlightConnectionsWidget extends WP_Widget
 
 	private function print_spotlight( $tag )
 	{
+		$settings = Connections_ConnectionCustomPostType::get_settings();
+		$connection_links_name = $settings['name']['link']['full_plural'];
+
 		// get all posts with the tag.
 		$posts = get_posts(
 			array(
@@ -178,7 +181,7 @@ class ConnectionsHub_RandomSpotlightConnectionsWidget extends WP_Widget
 		
 		<div class="spotlight-connections">
 		
-		<h2><a href="<?php echo get_tag_link($tag->term_id); ?>" title="<?php echo $tag->name; ?>"><?php echo $tag->name; ?></a></h2>
+		<h2><a href="<?php echo get_term_link($tag->slug, 'connection-link'); ?>" title="<?php echo $tag->name; ?>"><?php echo $tag->name; ?></a></h2>
 		
 		<?php foreach( $spotlight_posts as $p ): ?>
 		
@@ -214,6 +217,7 @@ class ConnectionsHub_RandomSpotlightConnectionsWidget extends WP_Widget
 			$story['contact-info'] = get_post_meta( $p->ID, 'contact-info', true );
 			$story['groups'] = $connection_groups;
 			$story['links'] = $connection_links;
+			$story['link'] = get_permalink($p->ID);
 			$story['site-link'] = $site_link;
 
 			$links = array(
@@ -254,6 +258,7 @@ class ConnectionsHub_RandomSpotlightConnectionsWidget extends WP_Widget
 		
 						<?php $count = 1; ?>
 						<div class="connection-links columns-<?php echo count($links); ?> clearfix">
+							<h5><?php echo $connection_links_name; ?></h5>
 							<?php foreach( $links as $link_column ): ?>
 							<div class="column column-<?php echo $count; ?>">
 							<?php foreach( $link_column as $link ): ?>
