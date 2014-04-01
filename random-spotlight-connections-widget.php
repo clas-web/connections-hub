@@ -278,6 +278,8 @@ class ConnectionsHub_RandomSpotlightConnectionsWidget extends WP_Widget
 			
 		<?php endforeach; ?>
 		
+		<div class="find-more"><a href="<?php echo get_term_link($tag->slug, 'connection-link'); ?>" title="<?php echo $tag->name; ?>">Find more...</a></div>
+		
 		</div>
 		<?php
 	}
