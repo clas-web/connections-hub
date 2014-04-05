@@ -41,7 +41,9 @@ class ConnectionsHub_AdminPage_SynchListTable extends WP_List_Table
 			array(
 				'post_type'   => 'connection',
 				'post_status' => 'publish',
-				'posts_per_page' => -1
+				'posts_per_page' => -1,
+				'meta_key' => 'entry-method',
+				'meta_value' => 'synch',
 			)
 		);
 		

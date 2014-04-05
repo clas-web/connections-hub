@@ -205,14 +205,6 @@ class Connections_ConnectionCustomPostType
 	 */
 	public static function add_meta_boxes()
 	{
-		add_meta_box(
-			'connections_info_box_imported_content',
-			'Imported Content',
-			array( 'Connections_ConnectionCustomPostType', 'info_box_imported_content' ),
-			'connection',
-			'normal',
-			'high'
-		);
 		add_meta_box( 
 			'connections_info_box_connections_info',
 			'Connection Info',
@@ -221,22 +213,72 @@ class Connections_ConnectionCustomPostType
 			'normal',
 			'high'
 		);
-		add_meta_box( 
-			'connections_info_box_synch_data',
-			'Synch Data',
-			array( 'Connections_ConnectionCustomPostType', 'info_box_synch_data' ),
+		add_meta_box(
+			'connections_info_box_imported_content',
+			'Content',
+			array( 'Connections_ConnectionCustomPostType', 'info_box_imported_content' ),
 			'connection',
-			'side',
-			'default'
+			'normal',
+			'high'
 		);
 		add_meta_box(
 			'connections_info_box_contact_info',
 			'Contact Info',
 			array( 'Connections_ConnectionCustomPostType', 'info_box_contact_info' ),
 			'connection',
-			'side',
-			'default'
+			'normal',
+			'high'
 		);
+		add_meta_box( 
+			'connections_info_box_synch_data',
+			'Connection Type',
+			array( 'Connections_ConnectionCustomPostType', 'info_box_synch_data' ),
+			'connection',
+			'side',
+			'high'
+		);
+	}
+	
+	
+	/**
+	 * Writes the HTML code used to create the contents of the Event meta box.
+	 * @param WP_Post The current post being displayed.
+	 */
+	public static function info_box_connections_info( $post )
+	{
+		$entry_method = self::get_entry_method( $post->ID );
+
+		$sort_title = get_post_meta( $post->ID, 'sort-title', true );
+		$username = get_post_meta( $post->ID, 'username', true );
+		$url = get_post_meta( $post->ID, 'url', true );
+		$site_type = get_post_meta( $post->ID, 'site-type', true );
+		
+		$site_types = array( 'wp' => 'WordPress site', 'rss' => 'RSS feed' );
+		if( !array_key_exists($site_type, $site_types) )
+			$site_type = 'wp';
+			
+		?>
+		<label for="connections-sort-title">Sort Title</label><br/>
+		<input type="text" id="connections-sort-title" name="connections-sort-title" value="<?php echo esc_attr($sort_title); ?>" style="width:100%" /><br/>
+
+		<label for="connections-name">Username</label><br/>
+		<input type="text" id="connections-username" name="connections-username" value="<?php echo esc_attr($username); ?>" style="width:100%" /><br/>
+
+		<?php if( $entry_method == 'synch' ): ?>
+		
+		<label for="connections-url">URL</label><br/>
+		<input type="text" id="connections-url" name="connections-url" value="<?php echo esc_attr($url); ?>" style="width:100%" /><br/>
+
+		<label for="connections-site-type">Site Type</label><br/>
+		<select name="connections-site-type">
+			<?php foreach( $site_types as $name => $value ): ?>
+				<option value="<?php echo $name; ?>" <?php echo ($site_type == $name ? 'selected' : ''); ?>><?php echo $value; ?></option>
+			<?php endforeach; ?>
+		</select>
+		
+		<?php endif; ?>
+		
+		<?php
 	}
 	
 	
@@ -247,49 +289,69 @@ class Connections_ConnectionCustomPostType
 	{
 		wp_nonce_field( CONNECTIONS_PLUGIN_PATH, 'connection-custom-post-type-entry-form' );
 
+		$entry_method = self::get_entry_method( $post->ID );
+	
 		$search_content = get_post_meta( $post->ID, 'search-content', true );
 
-		?>
+		if( $entry_method == 'synch' ): ?>
 		<textarea id="connections-imported-content" readonly style="width:100%;height:200px;"><?php echo $post->post_content; ?></textarea>
-
+		<?php else: ?>
+		<?php wp_editor( $post->post_content, 'content' ); ?>
+		<?php endif; ?>
+		
 		<label for="connections-search-content">Search Content</label><br/>
 		<textarea id="connections-search-content" readonly style="width:100%;height:50px;"><?php echo esc_attr($search_content); ?></textarea><br/>
 		<?php
 	}
 	
 	
-	/**
-	 * Writes the HTML code used to create the contents of the Event meta box.
-	 * @param WP_Post The current post being displayed.
-	 */
-	public static function info_box_connections_info( $post )
+	public static function info_box_contact_info( $post )
 	{
-		$sort_title = get_post_meta( $post->ID, 'sort-title', true );
-		$username = get_post_meta( $post->ID, 'username', true );
-		$url = get_post_meta( $post->ID, 'url', true );
-		$site_type = get_post_meta( $post->ID, 'site-type', true );
-		
-		$site_types = array( 'wp' => 'WordPress site', 'rss' => 'RSS feed' );
-		if( !array_key_exists($site_type, $site_types) )
-			$site_type = 'wp';
-		
+		$entry_method = self::get_entry_method( $post->ID );
+
+		if( $entry_method == 'synch' )
+		{
+			$contact_info = get_post_meta($post->ID, 'contact-info', true);
+			if( empty($contact_info) ) $contact_info = 'No contact info.';
+
+			?>
+			<div class="contact-info"><?php echo $contact_info; ?></div>
+			<?php
+
+			?>
+			<div class="synch-data">
+			<?php
+			echo Connections_ConnectionCustomPostType::format_synch_data(
+				get_post_meta($post->ID, 'synch-data', true)
+			);
+			?>
+			<div>
+			<?php
+		}
+		else
+		{
+			$contact_phone = get_post_meta($post->ID, 'contact-phone', true);
+			$contact_email = get_post_meta($post->ID, 'contact-email', true);
+			$contact_location = get_post_meta($post->ID, 'contact-location', true);
+			
+			?>
+			<div class="contact-info">
+			<label for="connections-contact-location">Location</label><br/>
+			<input type="text" id="connections-contact-location" name="connections-contact-location" value="<?php echo esc_attr($contact_location); ?>" style="width:100%" /><br/>
+			<label for="connections-contact-phone">Phone</label><br/>
+			<input type="text" id="connections-contact-phone" name="connections-contact-phone" value="<?php echo esc_attr($contact_phone); ?>" style="width:100%" /><br/>
+			<label for="connections-contact-email">Email</label><br/>
+			<input type="text" id="connections-contact-email" name="connections-contact-email" value="<?php echo esc_attr($contact_email); ?>" style="width:100%" /><br/>
+			</div>
+			<?php
+		}
 		?>
-		<label for="connections-sort-title">sort title</label><br/>
-		<input type="text" id="connections-sort-title" name="connections-sort-title" value="<?php echo esc_attr($sort_title); ?>" style="width:100%" /><br/>
 
-		<label for="connections-name">username</label><br/>
-		<input type="text" id="connections-username" name="connections-username" value="<?php echo esc_attr($username); ?>" style="width:100%" /><br/>
-
-		<label for="connections-url">URL</label><br/>
-		<input type="text" id="connections-url" name="connections-url" value="<?php echo esc_attr($url); ?>" style="width:100%" /><br/>
-
-		<label for="connections-site-type">Site Type</label><br/>
-		<select name="connections-site-type">
-			<?php foreach( $site_types as $name => $value ): ?>
-				<option value="<?php echo $name; ?>" <?php echo ($site_type == $name ? 'selected' : ''); ?>><?php echo $value; ?></option>
-			<?php endforeach; ?>
-		</select>
+		
 		<?php
+
+
+
 	}
 	
 	
@@ -299,10 +361,19 @@ class Connections_ConnectionCustomPostType
 	 */
 	public static function info_box_synch_data( $post )
 	{
-		$synch_data = Connections_ConnectionCustomPostType::format_synch_data( get_post_meta($post->ID, 'synch-data', true) );
-		echo $synch_data; 
+		$entry_method = self::get_entry_method( $post->ID );
 		?>
 
+		<div style="display:inline;margin-right:10px">
+			<input type="radio" name="connection-entry-method-type" value="manual" <?php echo ($entry_method == 'manual' ? 'checked' : ''); ?> />
+			Manual
+		</div>
+		<div style="display:inline;margin-right:10px">
+			<input type="radio" name="connection-entry-method-type" value="synch" <?php echo ($entry_method == 'synch' ? 'checked' : ''); ?> />
+			Synch
+		</div>
+
+		<?php if( $entry_method == 'synch' ): ?>
 		<div id="major-publishing-actions" style="margin:-12px;margin-top:10px;">
 
 			<?php if( $post->post_status !== 'publish' ): ?>
@@ -313,19 +384,9 @@ class Connections_ConnectionCustomPostType
 
 			<div class="clear"></div>
 		</div>
+		<?php endif; ?>
 		
 		<?php
-	}
-	
-	
-	public static function info_box_contact_info( $post )
-	{
-		$contact_info = get_post_meta($post->ID, 'contact-info', true);
-		
-		if( empty($contact_info) )
-			$contact_info = 'No contact info.';
-			
-		echo $contact_info;
 	}
 	
 	
@@ -350,21 +411,55 @@ class Connections_ConnectionCustomPostType
 		$post_data = $_POST;
 		unset($_POST); // prevent looping...
 
+		$entry_method = self::get_entry_method( $post_id );
+
 		//
 		// Save data
 		//
-		self::save_meta_data(
-			$post_id,
-			$post_data['connections-sort-title'],
-			$post_data['connections-url'], 
-			$post_data['connections-username'], 
-			$post_data['connections-site-type']
-		);
+		switch( $method_type )
+		{
+			case( 'synch' ):
+				// save sort title, username, url, site type
+				// save entry method
+				self::save_meta_data(
+					$post_id,
+					$post_data['connections-sort-title'],
+					$post_data['connections-username'], 
+					$post_data['connections-url'], 
+					$post_data['connections-site-type'],
+					$post_data['connection-entry-method-type']
+				);
+				break;
+				
+			case( 'manual' ):
+			default:
+				// create search content and save
+				// save sort title and username
+				// save contact phone, email, location
+				// save entry method
+				self::save_meta_data(
+					$post_id,
+					$post_data['connections-sort-title'],
+					$post_data['connections-username'], 
+					null,
+					null,
+					$post_data['connection-entry-method-type']
+				);
+				self::save_contact_info(
+					$post_id,
+					$post_data['connections-contact-phone'],
+					$post_data['connections-contact-email'],
+					$post_data['connections-contact-location']
+				);
+				$search_content = self::generate_search_data( $post_data['content'] );
+				update_post_meta( $post_id, 'search-content', $search_content );
+				break;
+		}
+		
 		
 		//
 		// Synch content
 		//
-		//echo '<pre>'; var_dump($_POST); echo '</pre>'; 
 		if( !isset($post_data['synch']) ) return;
 		
 		require_once( CONNECTIONS_PLUGIN_PATH.'/classes/synch-connection.php' );
@@ -377,35 +472,28 @@ class Connections_ConnectionCustomPostType
 	/**
 	 * 
 	 */
-	public static function save_meta_data( $post_id, $sort_title, $url, $username, $site_type )
+	public static function save_meta_data( $post_id, $sort_title, $username, $url = null, $site_type = null, $entry_method = null )
 	{
 		//
 		// Get current data
 		//
 		$meta_sort_title = get_post_meta( $post_id, 'sort-title', true );
 		$meta_username = get_post_meta( $post_id, 'username', true );
+		$meta_auto_synch = get_post_meta( $post_id, 'auto-synch', true );
 		$meta_url = get_post_meta( $post_id, 'url', true );
 		$meta_site_type = get_post_meta( $post_id, 'site-type', true );
-		$meta_needs_synch = get_post_meta( $post_id, 'needs-synch', true );
-		if( empty($meta_needs_synch) ) $meta_needs_synch = true;
-		else $meta_needs_synch = ($meta_needs_synch == 'true' ? true : false);
-
+		$meta_entry_method = self::get_entry_method( $post_id );
 		
 		// Save data
 		update_post_meta( $post_id, 'sort-title', $sort_title );
 		update_post_meta( $post_id, 'username', $username );
-		update_post_meta( $post_id, 'url', $url );
-		update_post_meta( $post_id, 'site-type', $site_type );
 	
-		
-		if( ($meta_needs_synch) || ($meta_url !== $url) || ($meta_site_type !== $site_type) )
-		{
-			update_post_meta( $post_id, 'needs-synch', 'true' );
-		}
-		else
-		{
-			update_post_meta( $post_id, 'needs-synch', 'false' );
-		}
+		if( $url !== null )
+			update_post_meta( $post_id, 'url', $url );
+		if( $site_type !== null )
+			update_post_meta( $post_id, 'site-type', $site_type );
+		if( $entry_method !== null )
+			update_post_meta( $post_id, 'entry-method', $entry_method );
 		
 		// set author
 		if( get_userdatabylogin($username) )
@@ -413,6 +501,15 @@ class Connections_ConnectionCustomPostType
 			$user = get_user_by( 'slug', $username );
 			wp_update_post( array('ID' => $post_id, 'post_author' => $user->ID) );
 		}
+	}
+	
+	
+	public static function save_contact_info( $post_id, $phone, $email, $location )
+	{
+		// Save data
+		update_post_meta( $post_id, 'contact-phone', $phone );
+		update_post_meta( $post_id, 'contact-email', $email );
+		update_post_meta( $post_id, 'contact-location', $location );
 	}
 	
 	
@@ -445,29 +542,35 @@ class Connections_ConnectionCustomPostType
 	 */
 	public static function all_connections_columns_value( $column_name, $post_id )
 	{
+		$entry_method = self::get_entry_method( $post_id );
+
 		switch( $column_name )
 		{
 			case 'url':
-				$url = get_post_meta( $post_id, 'url', true );
-				if( ($url = connections_fix_url($url)) == '' )
+				switch( $entry_method )
 				{
-					echo 'Invalid URL<br/>';
+					case( 'synch' ):
+						echo '<div class="synch-entry">';
+						$url = get_post_meta( $post_id, 'url', true );
+						if( ($url = connections_fix_url($url)) == '' )
+							echo 'Invalid URL<br/>';
+						else
+							echo '<a href="'.$url.'" target="_blank">'.$url.'</a><br/>';
+						$site_type = get_post_meta( $post_id, 'site-type', true );
+						switch($site_type)
+						{
+							case 'rss': echo 'RSS Feed'; break;
+							case 'wp': echo 'WordPress Site'; break;
+							default: echo 'Unknown'; break;
+						}
+						echo '</div>';
+						break;
+					
+					case( 'manual' ):
+					default:
+						echo '<div class="manual-entry">Manual Entry</div>';
+						break;
 				}
-				else
-				{
-					echo '<a href="'.$url.'" target="_blank">'.$url.'</a><br/>';
-				}
-				$site_type = get_post_meta( $post_id, 'site-type', true );
-				switch($site_type)
-				{
-					case 'rss': echo 'RSS Feed'; break;
-					case 'wp': echo 'WordPress Site'; break;
-					default: echo 'Unknown'; break;
-				}
-				break;
-
-			case 'synch':
-				echo Connections_ConnectionCustomPostType::format_synch_data( get_post_meta($post_id, 'synch-data', true) );
 				break;
 		}
 	}
@@ -495,6 +598,44 @@ class Connections_ConnectionCustomPostType
 		
 		return $sd;
 	}
+	
+	
+	public static function get_entry_method( $post_id )
+	{
+		$entry_method = get_post_meta( $post_id, 'entry-method', true );
+		if( $entry_method === '' ) $entry_method = 'manual';
+		return $entry_method;
+	}
+
+
+	public static function generate_search_data( $content )
+	{
+// 		$tags = array('<p>','</p>','<br />','<br/>','<br>','</li>','</ol>','</ul>','<hr />','<hr/>','<hr>','</h1>','</h2>','</h3>','</h4>','</h5>','</h6>');
+// 		$search_content = str_replace( $tags, "\n", $content);
+		$search_content = strip_tags($content);
+		$search_content = html_entity_decode($search_content, ENT_COMPAT | ENT_HTML401, 'UTF-8');
+// 		$search_content = preg_replace( "/[^A-Za-z0-9\n ]/", ' ', $search_content );
+		$search_content = preg_replace( '/  /', ' ', $search_content );
+		$search_content = preg_replace( '/\n\n+/', "\n", $search_content );
+		$search_content = preg_replace( '/(\r\n)(\r\n)+/', "\n", $search_content );
+// 		$search_content = explode( '\n', $search_content );
+// 		for( $i = 0; $i < count($search_content); $i++ )
+// 		{
+// 			$search_content[$i] = trim($search_content[$i]);
+// 			if( empty($search_content[$i]) )
+// 			{
+// 				$search_content[$i] = 'need to remove';
+// 				//array_splice( $search_content, $i, 1 );
+// 				//$i--;
+// 			}
+// 		}
+// 		$search_content = implode( '\n', $search_content );
+// 		$search_content = htmlentities2utf8( $content );
+
+		return $search_content;
+	}
+
+
 
 }
 

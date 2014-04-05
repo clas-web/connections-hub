@@ -204,7 +204,6 @@ class ConnectionsHub_AdminPage_ImportConnections
 		foreach( $rows as $username => $urows )
 		{
 			$urow = $urows[0];
-			$needs_synch = true;
 
 			//connections_print( $urow, 'UROW' );
 			
@@ -259,7 +258,6 @@ class ConnectionsHub_AdminPage_ImportConnections
 			}
 			else
 			{
-				$needs_synch = true;
 				$post_id = wp_insert_post( $connections_post );
 			}
 			
@@ -276,10 +274,9 @@ class ConnectionsHub_AdminPage_ImportConnections
 			}
 			
 			//
-			// Save the Connections meta data ( url, username, site-type, needs-synch ).
+			// Save the Connections meta data ( sort-title, url, username, site-type ).
 			//
-			Connections_ConnectionCustomPostType::save_meta_data( $post_id, $urow['sort-title'], $urow['url'], $username, $urow['site-type'] );
-			if( $needs_synch ) update_post_meta( $post_id, 'needs-synch', 'true' );
+			Connections_ConnectionCustomPostType::save_meta_data( $post_id, $urow['sort-title'], $urow['url'], $username, $urow['site-type'], 'synch' );
 		}
 		
 		//
