@@ -317,16 +317,6 @@ class Connections_ConnectionCustomPostType
 			?>
 			<div class="contact-info"><?php echo $contact_info; ?></div>
 			<?php
-
-			?>
-			<div class="synch-data">
-			<?php
-			echo Connections_ConnectionCustomPostType::format_synch_data(
-				get_post_meta($post->ID, 'synch-data', true)
-			);
-			?>
-			<div>
-			<?php
 		}
 		else
 		{
@@ -374,6 +364,13 @@ class Connections_ConnectionCustomPostType
 		</div>
 
 		<?php if( $entry_method == 'synch' ): ?>
+		<div class="synch-data" style="border:solid 1px #ddd;padding:5px 10px;margin-top:5px;background-color:#fafafa;">
+			<?php
+			echo Connections_ConnectionCustomPostType::format_synch_data(
+				get_post_meta($post->ID, 'synch-data', true)
+			);
+			?>
+		</div>
 		<div id="major-publishing-actions" style="margin:-12px;margin-top:10px;">
 
 			<?php if( $post->post_status !== 'publish' ): ?>
@@ -416,7 +413,7 @@ class Connections_ConnectionCustomPostType
 		//
 		// Save data
 		//
-		switch( $method_type )
+		switch( $entry_method )
 		{
 			case( 'synch' ):
 				// save sort title, username, url, site type
@@ -473,7 +470,7 @@ class Connections_ConnectionCustomPostType
 	 * 
 	 */
 	public static function save_meta_data( $post_id, $sort_title, $username, $url = null, $site_type = null, $entry_method = null )
-	{
+	{		
 		//
 		// Get current data
 		//
