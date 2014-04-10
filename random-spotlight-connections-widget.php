@@ -18,7 +18,7 @@ class ConnectionsHub_RandomSpotlightConnectionsWidget extends WP_Widget
 		
 		parent::__construct(
 			'connections-hub_random-connections-spotlight-widget',
-			'Random Connections Spotlight',
+			'Connections Spotlight',
 			array( 
 				'description' => 'Display random Connections by tag.', 
 			)
