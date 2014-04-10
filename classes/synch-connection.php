@@ -81,8 +81,8 @@ class ConnectionsHub_SynchConnection
 	
 	public static function synch( $connection_post_id, &$data )
 	{
-		$content = ( !empty($data['content']) ? $content : '' );
-		$search_data = generate_search_data( $content );
+		$content = ( !empty($data['content']) ? $data['content'] : '' );
+		$search_content = Connections_ConnectionCustomPostType::generate_search_data( $content );
 
 		$synch_data = array(
 			'blog-id' => ( !empty($data['blog-id']) ? $data['blog-id'] : 'n/a' ),
