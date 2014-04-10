@@ -103,7 +103,7 @@ class Connections_ConnectionCustomPostType
 			'description'   => "Holds our $full_plural data",
 			'public'        => true,
 			'menu_position' => 5,
-			'supports'      => array( 'title' ),
+			'supports'      => array( 'title', 'author' ),
 			'taxonomies'    => array(),
 			'rewrite'       => array( 'slug' => $slug ),
 			'has_archive'   => true,
