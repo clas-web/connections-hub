@@ -276,7 +276,7 @@ class ConnectionsHub_AdminPage_ImportConnections
 			//
 			// Save the Connections meta data ( sort-title, url, username, site-type ).
 			//
-			Connections_ConnectionCustomPostType::save_meta_data( $post_id, $urow['sort-title'], $urow['url'], $username, $urow['site-type'], 'synch' );
+			Connections_ConnectionCustomPostType::save_meta_data( $post_id, $urow['sort-title'], $urow['url'], $username, $urow['site-type'], $urow['entry-method'] );
 		}
 		
 		//
