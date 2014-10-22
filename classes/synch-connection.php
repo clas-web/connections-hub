@@ -4,12 +4,56 @@
 class ConnectionsHub_SynchConnection
 {
 	public static $last_error = '';
+	public static $debug = false;
 
 
 	/* */
 	private function __construct() { }
 	
 
+	public static function write_to_log( $line )
+	{
+		if( self::debug ) file_put_contents( CRON_LOG, $line, FILE_APPEND );		
+	}
+
+	
+	public static function synch_all_connections( $log_output = false )
+	{
+		self::debug = $log_output;
+		
+		self::write_to_log( "------------------------------------------------------\n" );
+		self::write_to_log( " START SYNCHING CONNECTIONS   ".date('m d, Y h:i:s A')." \n" );
+		self::write_to_log( "------------------------------------------------------\n\n\n" );
+
+		self::write_to_log( "Retreiving all Connections..." );
+		$connections = self::get_connections();
+		self::write_to_log( "done.\n" );
+		self::write_to_log( count($connections)." Connections found.\n\n" );
+		
+		foreach( $connections as $connection )
+		{
+			self::write_to_log( $connection['post-id']." - ".$connection['name']."\n" );
+			self::write_to_log( "Synching..." );
+
+			$data = self::get_data( $connection['post-id'] );
+
+			if( $data === false )
+			{
+				self::write_to_log( "ERROR.\n" );
+				self::write_to_log( self::last_error."\n\n" );
+				continue;
+			}
+			
+			self::synch( $connection['post-id'], $data );
+			
+			self::write_to_log( "done.\n\n" );
+		}
+		
+		self::write_to_log( "\n" );
+		self::write_to_log( "------------------------------------------------------\n" );
+		self::write_to_log( " DONE SYNCHING CONNECTIONS    ".date('m d, Y h:i:s A')." \n" );
+		self::write_to_log( "------------------------------------------------------\n" );
+	}
 	
 	
 	public static function get_connections()

@@ -9,6 +9,8 @@ define( 'CONNECTIONS_PLUGIN_NAME', 'Connections Hub' );
 define( 'CONNECTIONS_PLUGIN_PATH', dirname(__FILE__) );
 define( 'CONNECTIONS_PLUGIN_URL', plugins_url(basename(CONNECTIONS_PLUGIN_PATH)) );
 
+define( 'CRON_LOG', CONNECTIONS_PLUGIN_PATH . '/logs/' . date('Ymd-His') );
+
 $connections_url_replacements = array();
 
 if( CONNECTIONS_DEBUG )

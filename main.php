@@ -14,6 +14,9 @@ require_once( CONNECTIONS_PLUGIN_PATH.'/util.php' );
 require_once( CONNECTIONS_PLUGIN_PATH.'/custom-post-type/connection.php' );
 require_once( CONNECTIONS_PLUGIN_PATH.'/random-spotlight-connections-widget.php' );
 
+add_filter( 'query_vars', array('ConnectionsHub_Main', 'query_vars') );
+add_action( 'parse_request', array('ConnectionsHub_Main', 'parse_request') );
+
 if( is_admin() )
 {
 	add_action( 'admin_init', array('ConnectionsHub_Main', 'setup_actions') );
@@ -96,6 +99,34 @@ class ConnectionsHub_Main
 		require_once( CONNECTIONS_PLUGIN_PATH.'/admin-page.php' );
 		ConnectionsHub_AdminPage::init();
 		ConnectionsHub_AdminPage::setup_actions();
+	}
+	
+	
+	
+	/**
+	 * Adds "synch-connections" to the list of parseable query variables.
+	 */
+	public static function query_vars( $query_vars )
+	{
+		$query_vars[] = 'synch-connections';
+		return $query_vars;
+	}
+
+
+	/**
+	 * Check for the plugin's tag and if found, then process the mobile post data
+	 * from the Android device.
+	 */
+	public static function parse_request( &$wp )
+	{
+		global $wp;
+		if( array_key_exists('synch-connections', $wp->query_vars) )
+		{
+ 			require_once( CONNECTIONS_PLUGIN_PATH . '/classes/synch-connection.php' );
+ 			ConnectionsHub_SynchConnection::synch_all_connections( true );
+			exit();
+		}
+		return;
 	}
 
 }
