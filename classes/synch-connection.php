@@ -10,6 +10,40 @@ class ConnectionsHub_SynchConnection
 	private function __construct() { }
 	
 
+	
+	
+	public static function get_connections()
+	{
+		$connections = array();
+		
+		$wpquery = new WP_Query(
+			array(
+				'post_type'   => 'connection',
+				'post_status' => 'publish',
+				'posts_per_page' => -1,
+				'meta_key' => 'entry-method',
+				'meta_value' => 'synch',
+			)
+		);
+		
+		while( $wpquery->have_posts() )
+		{
+			$wpquery->the_post();
+			$post = get_post();
+			
+			$connections[] = array(
+				'name'       => $post->post_title,
+				'url'        => connections_fix_url( get_post_meta( $post->ID, 'url', true ) ),
+				'site-type'  => get_post_meta( $post->ID, 'site-type', true ),
+				'synch-data' => get_post_meta( $post->ID, 'synch-data', true ),
+				'post-id'    => $post->ID,
+			);
+		}
+		
+		return $connections;
+	}
+	
+	
 	public static function get_data( $connection_post_id )
 	{
 		$connections_post = get_post( $connection_post_id );

@@ -3,6 +3,12 @@
 if( !class_exists('WP_List_Table') )
 	require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
 
+if( !class_exists('ConnectionsHub_SynchConnection') )
+	require_once( CONNECTIONS_PLUGIN_PATH . '/classes/synch-connection.php' );
+
+if( !class_exists('Connections_ConnectionCustomPostType' )
+	require_once( CONNECTIONS_PLUGIN_PATH . '/custom-post-type/connection.php' );
+
 
 /**
  * 
@@ -35,31 +41,7 @@ class ConnectionsHub_AdminPage_SynchListTable extends WP_List_Table
 	 */
 	function get_items()
 	{
-		$this->items = array();
-		
-		$wpquery = new WP_Query(
-			array(
-				'post_type'   => 'connection',
-				'post_status' => 'publish',
-				'posts_per_page' => -1,
-				'meta_key' => 'entry-method',
-				'meta_value' => 'synch',
-			)
-		);
-		
-		while( $wpquery->have_posts() )
-		{
-			$wpquery->the_post();
-			$post = get_post();
-			
-			$this->items[] = array(
-				'name'       => $post->post_title,
-				'url'        => connections_fix_url( get_post_meta( $post->ID, 'url', true ) ),
-				'site-type'  => get_post_meta( $post->ID, 'site-type', true ),
-				'synch-data' => get_post_meta( $post->ID, 'synch-data', true ),
-				'post-id'    => $post->ID,
-			);
-		}
+		$this->items = ConnectionsHub_SynchConnection::get_connections();
 	}
 	
 	
