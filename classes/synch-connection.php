@@ -13,17 +13,17 @@ class ConnectionsHub_SynchConnection
 
 	public static function write_to_log( $line )
 	{
-		if( self::debug ) file_put_contents( CRON_LOG, $line, FILE_APPEND );		
+		if( self::$debug ) file_put_contents( CRON_LOG, $line, FILE_APPEND );		
 	}
 
 	
 	public static function synch_all_connections( $log_output = false )
 	{
-		self::debug = $log_output;
+		self::$debug = $log_output;
 		
-		self::write_to_log( "------------------------------------------------------\n" );
-		self::write_to_log( " START SYNCHING CONNECTIONS   ".date('m d, Y h:i:s A')." \n" );
-		self::write_to_log( "------------------------------------------------------\n\n\n" );
+		self::write_to_log( "-----------------------------------------------------\n" );
+		self::write_to_log( " START SYNCHING CONNECTIONS   ".date('m-d-Y h:i:s A')." \n" );
+		self::write_to_log( "-----------------------------------------------------\n\n\n" );
 
 		self::write_to_log( "Retreiving all Connections..." );
 		$connections = self::get_connections();
@@ -40,7 +40,7 @@ class ConnectionsHub_SynchConnection
 			if( $data === false )
 			{
 				self::write_to_log( "ERROR.\n" );
-				self::write_to_log( self::last_error."\n\n" );
+				self::write_to_log( self::$last_error."\n\n" );
 				continue;
 			}
 			
@@ -50,9 +50,9 @@ class ConnectionsHub_SynchConnection
 		}
 		
 		self::write_to_log( "\n" );
-		self::write_to_log( "------------------------------------------------------\n" );
-		self::write_to_log( " DONE SYNCHING CONNECTIONS    ".date('m d, Y h:i:s A')." \n" );
-		self::write_to_log( "------------------------------------------------------\n" );
+		self::write_to_log( "-----------------------------------------------------\n" );
+		self::write_to_log( " DONE SYNCHING CONNECTIONS    ".date('m-d-Y h:i:s A')." \n" );
+		self::write_to_log( "-----------------------------------------------------\n" );
 	}
 	
 	
@@ -130,7 +130,7 @@ class ConnectionsHub_SynchConnection
 		{
 			$result = call_user_func_array( 
 				array( 'ConnectionsHub_SynchConnection', 'get_'.$action.'_data' ),
-				array( $connection_post_id, $url, $update_connection )
+				array( $connection_post_id, $url )
 			);
 			
 			if( $result !== false ) 

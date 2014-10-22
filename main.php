@@ -122,8 +122,10 @@ class ConnectionsHub_Main
 		global $wp;
 		if( array_key_exists('synch-connections', $wp->query_vars) )
 		{
+			echo "\nSynching Connctions...";
  			require_once( CONNECTIONS_PLUGIN_PATH . '/classes/synch-connection.php' );
  			ConnectionsHub_SynchConnection::synch_all_connections( true );
+ 			echo "done.\n\n";
 			exit();
 		}
 		return;

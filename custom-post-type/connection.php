@@ -610,7 +610,7 @@ class Connections_ConnectionCustomPostType
 // 		$tags = array('<p>','</p>','<br />','<br/>','<br>','</li>','</ol>','</ul>','<hr />','<hr/>','<hr>','</h1>','</h2>','</h3>','</h4>','</h5>','</h6>');
 // 		$search_content = str_replace( $tags, "\n", $content);
 		$search_content = strip_tags($content);
-		$search_content = html_entity_decode($search_content, ENT_COMPAT | ENT_HTML401, 'UTF-8');
+		$search_content = html_entity_decode($search_content, ENT_COMPAT, 'UTF-8');
 // 		$search_content = preg_replace( "/[^A-Za-z0-9\n ]/", ' ', $search_content );
 		$search_content = preg_replace( '/  /', ' ', $search_content );
 		$search_content = preg_replace( '/\n\n+/', "\n", $search_content );
