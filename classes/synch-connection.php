@@ -318,8 +318,9 @@ class ConnectionsHub_SynchConnection
 			$last_author = '';
 			if( $last_id = get_post_meta( $post_id, '_edit_last', true) )
 			{
-				$last_user = get_userdata($last_id);
-				$last_author = apply_filters('the_modified_author', $last_user->display_name);
+				$last_user = get_userdata( $last_id );
+				if( $last_user )
+					$last_author = apply_filters('the_modified_author', $last_user->display_name);
 			}
 			
 			$synch_data = array(
