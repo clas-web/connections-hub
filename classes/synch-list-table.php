@@ -6,7 +6,7 @@ if( !class_exists('WP_List_Table') )
 if( !class_exists('ConnectionsHub_SynchConnection') )
 	require_once( CONNECTIONS_PLUGIN_PATH . '/classes/synch-connection.php' );
 
-if( !class_exists('Connections_ConnectionCustomPostType' )
+if( !class_exists('Connections_ConnectionCustomPostType') )
 	require_once( CONNECTIONS_PLUGIN_PATH . '/custom-post-type/connection.php' );
 
 
