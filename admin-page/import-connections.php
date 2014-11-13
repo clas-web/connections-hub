@@ -179,7 +179,7 @@ class ConnectionsHub_AdminPage_ImportConnections
 			self::$error_messages[] = 'Error uploading file: "'.$filename.'".  Unsupported filetype: "'.$_FILES['csv-file']['type'].'".';
 			return;
 		}
-
+		
 		//
 		// Parse the csv.
 		//		
@@ -197,7 +197,7 @@ class ConnectionsHub_AdminPage_ImportConnections
 		// Organize the rows into an associated array with the username as key.
 		//
 		self::organize_by_username( $rows );
-		
+
 		//
 		// Insert or update each user in csv.
 		//
@@ -234,6 +234,7 @@ class ConnectionsHub_AdminPage_ImportConnections
 					'post_type'  => 'connection',
 					'meta_key'   => 'username',
 					'meta_value' => $username,
+					'posts_per_page' => -1,
 				)
 			);
 
@@ -276,7 +277,7 @@ class ConnectionsHub_AdminPage_ImportConnections
 			//
 			// Save the Connections meta data ( sort-title, url, username, site-type ).
 			//
-			Connections_ConnectionCustomPostType::save_meta_data( $post_id, $urow['sort-title'], $urow['url'], $username, $urow['site-type'], $urow['entry-method'] );
+			Connections_ConnectionCustomPostType::save_meta_data( $post_id, $urow['sort-title'], $username, $urow['url'], $urow['site-type'], $urow['entry-method'] );
 		}
 		
 		//

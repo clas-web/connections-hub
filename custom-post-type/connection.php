@@ -13,6 +13,7 @@ add_action( 'add_meta_boxes', array( 'Connections_ConnectionCustomPostType', 'ad
 add_action( 'save_post_connection', array( 'Connections_ConnectionCustomPostType', 'save_post_entry_form' ), 9999, 3 );
 
 // All Connections changes
+//add_filter( 'pre_get_posts', array('Connections_ConnectionCustomPostType', 'alter_connections_query') );
 add_filter( 'views_edit-connection', array( 'Connections_ConnectionCustomPostType', 'all_connections_add_synch_button' ) );
 add_filter( 'manage_edit-connection_columns', array( 'Connections_ConnectionCustomPostType', 'all_connections_columns_key' ) );
 add_action( 'manage_connection_posts_custom_column', array( 'Connections_ConnectionCustomPostType', 'all_connections_columns_value' ), 10, 2 );
@@ -470,7 +471,7 @@ class Connections_ConnectionCustomPostType
 	 * 
 	 */
 	public static function save_meta_data( $post_id, $sort_title, $username, $url = null, $site_type = null, $entry_method = null )
-	{		
+	{
 		//
 		// Get current data
 		//
@@ -509,7 +510,26 @@ class Connections_ConnectionCustomPostType
 		update_post_meta( $post_id, 'contact-location', $location );
 	}
 	
+
+	public static function alter_connection_query( $wp_query )
+	{
+		if( !is_admin() ) return;
+		if( !$wp_query->is_main_query() ) return;
+
+		$screen = get_current_screen();
+		if( $screen->base != 'edit' ) return;
+
+		if( $wp_query->post_type !== 'connection' ) return;
+		
+		$wp_query->set( 'posts_per_page', get_user_option('edit_connection_per_page') );
+
+// 		if( ($wp_query->get('orderby')) && ($wp_query->get('orderby') != 'datetime') ) return;
+// 		
+// 		$wp_query->set( 'meta_key', 'datetime' );
+// 		$wp_query->set( 'orderby', 'meta_value' );
+	}
 	
+		
 	/**
 	 * 
 	 */
