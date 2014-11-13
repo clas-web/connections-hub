@@ -547,9 +547,23 @@ class Connections_ConnectionCustomPostType
 	 */
 	public static function all_connections_columns_key( $columns )
 	{
+// 		unset($columns['taxonomy-connection-link']);
+
 		$columns['url'] = 'Source';
 		//$columns['synch'] = 'Synch Data';
-		unset($columns['taxonomy-connection-link']);
+
+		/*
+		-connections links
+		-email address
+		-phone number
+		-location
+		*/
+		
+// 		$columns['taxonomy-connection-link'] = 'Connection Links';
+		$columns['email'] = 'Email';
+		$columns['phone'] = 'Phone';
+		$columns['location'] = 'Location';
+		
 		return $columns;
 	}
 	
@@ -559,12 +573,10 @@ class Connections_ConnectionCustomPostType
 	 */
 	public static function all_connections_columns_value( $column_name, $post_id )
 	{
-		$entry_method = self::get_entry_method( $post_id );
-
 		switch( $column_name )
 		{
 			case 'url':
-				switch( $entry_method )
+				switch( self::get_entry_method($post_id) )
 				{
 					case( 'synch' ):
 						echo '<div class="synch-entry">';
@@ -588,6 +600,21 @@ class Connections_ConnectionCustomPostType
 						echo '<div class="manual-entry">Manual Entry</div>';
 						break;
 				}
+				break;
+			
+			case 'email':
+				$contact_email = get_post_meta($post->ID, 'contact-email', true);
+				echo $contact_email;
+				break;
+			
+			case 'phone':
+				$contact_phone = get_post_meta($post->ID, 'contact-phone', true);
+				echo $contact_phone;
+				break;
+			
+			case 'location':
+				$contact_location = get_post_meta($post->ID, 'contact-location', true);
+				echo $contact_location;
 				break;
 		}
 	}

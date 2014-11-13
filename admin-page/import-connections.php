@@ -102,10 +102,12 @@ class ConnectionsHub_AdminPage_ImportConnections
 				<?php submit_button( 'Import' ); ?>
 			</form>
 			
+			<!--
 			<form action="" method="post" enctype="multipart/form-data">
 				<input type="hidden" name="action" value="clear-connections" />
 				<?php submit_button( 'Clear Connections' ); ?>
 			</form>
+			-->
 			
 		</div>
 		
@@ -129,7 +131,7 @@ class ConnectionsHub_AdminPage_ImportConnections
 				break;
 				
 			case 'clear-connections':
-				self::clear_connections();
+				//self::clear_connections();
 				break;
 		}
 	}
