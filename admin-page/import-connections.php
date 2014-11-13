@@ -285,39 +285,40 @@ class ConnectionsHub_AdminPage_ImportConnections
 		//
 		// Change status to 'draft' for user's no longer in csv.
 		//
-		$wpquery = new WP_Query(
-			array(
-				'post_type'   => 'connection',
-				'post_status' => 'publish',
-				'meta_key'    => 'username',
-				'meta_query'  => array(
-					array(
-						'key'     => 'username',
-						'value'   => array_keys($rows),
-						'compare' => 'NOT IN'
-					),
-				)
-			)
-		);
-		
-		if( $wpquery->have_posts() )
-		{
-			$connections_post = array( 'post_status' => 'draft' );
-			
-			while( $wpquery->have_posts() )
-			{
-				$wpquery->the_post();
-				$post = get_post();
-				$connections_post['ID'] = $post->ID;
-				wp_update_post( $connections_post );
-			}
-		}
-		else
-		{
-			//echo 'no users to remove.';
-		}
-		
-		wp_reset_query();
+// 		$wpquery = new WP_Query(
+// 			array(
+// 				'post_type'   => 'connection',
+// 				'post_status' => 'publish',
+// 				'posts_per_page' => -1,
+// 				'meta_key'    => 'username',
+// 				'meta_query'  => array(
+// 					array(
+// 						'key'     => 'username',
+// 						'value'   => array_keys($rows),
+// 						'compare' => 'NOT IN'
+// 					),
+// 				)
+// 			)
+// 		);
+// 		
+// 		if( $wpquery->have_posts() )
+// 		{
+// 			$connections_post = array( 'post_status' => 'draft' );
+// 			
+// 			while( $wpquery->have_posts() )
+// 			{
+// 				$wpquery->the_post();
+// 				$post = get_post();
+// 				$connections_post['ID'] = $post->ID;
+// 				wp_update_post( $connections_post );
+// 			}
+// 		}
+// 		else
+// 		{
+// 			//echo 'no users to remove.';
+// 		}
+// 		
+// 		wp_reset_query();
 
 		//
 		// Done.
