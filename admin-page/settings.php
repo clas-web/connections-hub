@@ -46,7 +46,7 @@ class ConnectionsHub_AdminPage_Settings
 	public static function enqueue_scripts()
 	{
 		wp_deregister_script('jquery');
-		wp_enqueue_script('jquery', 'http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js');
+		wp_enqueue_script('jquery', 'https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js');
 	}
 	
 	
