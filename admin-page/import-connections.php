@@ -209,6 +209,9 @@ class ConnectionsHub_AdminPage_ImportConnections
 
 			//connections_print( $urow, 'UROW' );
 			
+			$urow['slug'] = ( isset($urow['slug']) ? $urow['slug'] : sanitize_title($urow['title']) );
+			$urow['content'] = ( isset($urow['content']) ? $urow['content'] : '' );
+			
 			//
 			// Set defaults for the Connection post.
 			//
@@ -217,6 +220,7 @@ class ConnectionsHub_AdminPage_ImportConnections
 				'post_name'    => $urow['slug'],
 				'post_type'    => 'connection',
 				'post_status'  => 'publish',
+				'post_content' => $urow['content'],
 			);
 			
 			//
