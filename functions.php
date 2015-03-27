@@ -2,16 +2,8 @@
 
 
 /**
- * 
+ * @param  
  */
-function connections_print( $text, $label = null )
-{
-	echo '<pre>';
-	if( $label !== null ) var_dump($label);
-	var_dump($text);
-	echo '</pre>';
-}
-
 function connections_log( $text )
 {
 	file_put_contents( dirname(__FILE__).'/log.txt', print_r($text,true)."\n", FILE_APPEND );

@@ -288,7 +288,7 @@ class Connections_ConnectionCustomPostType
 	 */
 	public static function info_box_imported_content( $post )
 	{
-		wp_nonce_field( CONNECTIONS_PLUGIN_PATH, 'connection-custom-post-type-entry-form' );
+		wp_nonce_field( CONNECTIONS_HUB_PLUGIN_PATH, 'connection-custom-post-type-entry-form' );
 
 		$entry_method = self::get_entry_method( $post->ID );
 	
@@ -403,7 +403,7 @@ class Connections_ConnectionCustomPostType
 		if ( !current_user_can('edit_page', $post_id) )
 			return;
 
-		if( !wp_verify_nonce($_POST['connection-custom-post-type-entry-form'], CONNECTIONS_PLUGIN_PATH) )
+		if( !wp_verify_nonce($_POST['connection-custom-post-type-entry-form'], CONNECTIONS_HUB_PLUGIN_PATH) )
 			return;
 		
 		$post_data = $_POST;
@@ -460,7 +460,7 @@ class Connections_ConnectionCustomPostType
 		//
 		if( !isset($post_data['synch']) ) return;
 		
-		require_once( CONNECTIONS_PLUGIN_PATH.'/classes/synch-connection.php' );
+		require_once( CONNECTIONS_HUB_PLUGIN_PATH.'/classes/synch-connection.php' );
 		$synch_data = ConnectionsHub_SynchConnection::get_data($post_id);
 		if( $synch_data !== false )
 			ConnectionsHub_SynchConnection::synch($post_id, $synch_data);
@@ -494,9 +494,8 @@ class Connections_ConnectionCustomPostType
 			update_post_meta( $post_id, 'entry-method', $entry_method );
 		
 		// set author
-		if( get_userdatabylogin($username) )
+		if( $user = get_user_by('login', $username) )
 		{
-			$user = get_user_by( 'slug', $username );
 			wp_update_post( array('ID' => $post_id, 'post_author' => $user->ID) );
 		}
 	}
@@ -536,7 +535,7 @@ class Connections_ConnectionCustomPostType
 	public static function all_connections_add_synch_button( $views )
 	{
 		$views['connections-synch'] = '
-			<a href="edit.php?post_type=connection&page=connections-synch-connections" title="Synch Connections" style="font-weight:bold">Synch Connections &raquo;</a>
+			<a href="edit.php?post_type=connection&page=synch-connections" title="Synch Connections" style="font-weight:bold">Synch Connections &raquo;</a>
 		';
 		return $views;
 	}
@@ -580,11 +579,12 @@ class Connections_ConnectionCustomPostType
 				{
 					case( 'synch' ):
 						echo '<div class="synch-entry">';
+						
 						$url = get_post_meta( $post_id, 'url', true );
-						if( ($url = connections_fix_url($url)) == '' )
-							echo 'Invalid URL<br/>';
-						else
-							echo '<a href="'.$url.'" target="_blank">'.$url.'</a><br/>';
+// 						$url = connections_fix_url( $url );
+						if( $url === '' ) echo 'Invalid URL<br/>';
+						else echo '<a href="'.$url.'" target="_blank">'.$url.'</a><br/>';
+						
 						$site_type = get_post_meta( $post_id, 'site-type', true );
 						switch($site_type)
 						{
@@ -603,17 +603,17 @@ class Connections_ConnectionCustomPostType
 				break;
 			
 			case 'email':
-				$contact_email = get_post_meta($post->ID, 'contact-email', true);
+				$contact_email = get_post_meta($post_id, 'contact-email', true);
 				echo $contact_email;
 				break;
 			
 			case 'phone':
-				$contact_phone = get_post_meta($post->ID, 'contact-phone', true);
+				$contact_phone = get_post_meta($post_id, 'contact-phone', true);
 				echo $contact_phone;
 				break;
 			
 			case 'location':
-				$contact_location = get_post_meta($post->ID, 'contact-location', true);
+				$contact_location = get_post_meta($post_id, 'contact-location', true);
 				echo $contact_location;
 				break;
 		}

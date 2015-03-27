@@ -3,26 +3,49 @@
 Plugin Name: Connections Hub
 Plugin URI: 
 Description: 
-Version: 2.0.0
+Version: 2.5.0
 Author: Crystal Barton
 Author URI: http://www.crystalbarton.com
 */
 
 
-require_once( dirname(__FILE__).'/config.php' );
-require_once( CONNECTIONS_PLUGIN_PATH.'/util.php' );
-require_once( CONNECTIONS_PLUGIN_PATH.'/custom-post-type/connection.php' );
-require_once( CONNECTIONS_PLUGIN_PATH.'/random-spotlight-connections-widget.php' );
+if( !defined('CONNECTIONS_HUB') ):
+
+define( 'CONNECTIONS_HUB', 'Connections Hub' );
+
+define( 'CONNECTIONS_HUB_DEBUG', true );
+
+define( 'CONNECTIONS_HUB_PLUGIN_PATH', dirname(__FILE__) );
+define( 'CONNECTIONS_HUB_PLUGIN_URL', plugins_url('', __FILE__) );
+
+define( 'CONNECTIONS_HUB_VERSION', '2.5.0' );
+define( 'CONNECTIONS_HUB_DB_VERSION', '1.0' );
+
+define( 'CONNECTIONS_HUB_VERSION_OPTION', 'organization-hub-version' );
+define( 'CONNECTIONS_HUB_DB_VERSION_OPTION', 'organization-hub-db-version' );
+
+define( 'CONNECTIONS_HUB_OPTIONS', 'organization-hub-options' );
+define( 'CONNECTIONS_HUB_LOG_FILE', dirname(__FILE__).'/logs/'.date('Ymd-His').'.txt' );
+
+endif;
+
+
+
+
+require_once( CONNECTIONS_HUB_PLUGIN_PATH.'/classes/model/model.php' );
+require_once( CONNECTIONS_HUB_PLUGIN_PATH.'/classes/model/synch-model.php' );
+require_once( CONNECTIONS_HUB_PLUGIN_PATH.'/classes/custom-post-type/connection.php' );
+require_once( CONNECTIONS_HUB_PLUGIN_PATH.'/classes/widget/random-spotlight-connections.php' );
+
 
 add_filter( 'query_vars', array('ConnectionsHub_Main', 'query_vars') );
 add_action( 'parse_request', array('ConnectionsHub_Main', 'parse_request') );
 
 if( is_admin() )
 {
-	add_action( 'admin_init', array('ConnectionsHub_Main', 'setup_actions') );
-	add_action( 'admin_menu', array('ConnectionsHub_Main', 'setup_admin_pages') );
-	
-	add_action("wp_ajax_connections-synch", array('ConnectionsHub_Main', 'show_admin_ajax_page'));
+	add_action( 'admin_enqueue_scripts', array('ConnectionsHub_Main', 'enqueue_scripts') );
+	add_action( 'wp_loaded', array('ConnectionsHub_Main', 'load') );
+	add_action( 'admin_menu', array('ConnectionsHub_Main', 'update'), 5 );
 }
 
 
@@ -32,75 +55,49 @@ if( is_admin() )
  */
 class ConnectionsHub_Main
 {
-
 	/**
-	 * Adds the main admin page to the admin menu.
+	 * 
 	 */
-	public static function setup_admin_pages()
+	public static function load()
 	{
-	    add_submenu_page(
-	    	'edit.php?post_type=connection', 
-	    	'Connections Import Page', 
-	    	'Import',
-	    	'administrator', 
-	    	'connections-import-connections', 
-	    	array('ConnectionsHub_Main', 'show_admin_page')
-	    );
+		require_once( dirname(__FILE__).'/admin-pages/require.php' );
+		
+		// Site admin page.
+		$connhub_pages = new APL_Handler( false );
 
-	    add_submenu_page(
-	    	'edit.php?post_type=connection', 
-	    	'Connections Synch Page', 
-	    	'Synch',
-	    	'administrator', 
-	    	'connections-synch-connections', 
-	    	array('ConnectionsHub_Main', 'show_admin_page')
-	    );
-
-	    add_submenu_page(
-	    	'edit.php?post_type=connection', 
-	    	'Connections Settings Page', 
-	    	'Settings',
-	    	'administrator', 
-	    	'connections-settings', 
-	    	array('ConnectionsHub_Main', 'show_admin_page')
-	    );
-	}
-
-
-	/**
-	 * Shows the admin page for the plugin.
-	 */
-	public static function show_admin_page()
-	{
-		require_once( CONNECTIONS_PLUGIN_PATH.'/admin-page.php' );
-		ConnectionsHub_AdminPage::init();
-		ConnectionsHub_AdminPage::show_page();
+		$connhub_pages->add_page( new ConnectionsHub_ImportConnectionsAdminPage, 'edit.php?post_type=connection' );
+		$connhub_pages->add_page( new ConnectionsHub_SynchConnectionsAdminPage, 'edit.php?post_type=connection' );
+		$connhub_pages->add_page( new ConnectionsHub_SettingsAdminPage, 'edit.php?post_type=connection' );
+		$connhub_pages->setup();
 	}
 	
 	
 	/**
-	 * Processes AJAX requests from the plugin.
+	 * 
 	 */
-	public static function show_admin_ajax_page()
+	public static function update()
 	{
-		require_once( CONNECTIONS_PLUGIN_PATH.'/admin-ajax-page.php' );
-		ConnectionsHub_AdminAjaxPage::init();
-		ConnectionsHub_AdminAjaxPage::process();
-		ConnectionsHub_AdminAjaxPage::output();
-		exit();
-	}
-
-
-	/**
-	 * Adds the needed JavaScript and CSS files needed for the plugin.
-	 */	
-	public static function setup_actions()
-	{
-		require_once( CONNECTIONS_PLUGIN_PATH.'/admin-page.php' );
-		ConnectionsHub_AdminPage::init();
-		ConnectionsHub_AdminPage::setup_actions();
+//		$version = get_option( CONNECTIONS_HUB_DB_VERSION_OPTION );
+//  	if( $version !== CONNECTIONS_HUB_DB_VERSION )
+//  	{
+ 			$model = ConnectionsHub_Model::get_instance();
+//  			$model->create_tables();
+//  	}
+ 		
+ 		update_option( CONNECTIONS_HUB_VERSION_OPTION, CONNECTIONS_HUB_VERSION );
+ 		update_option( CONNECTIONS_HUB_DB_VERSION_OPTION, CONNECTIONS_HUB_DB_VERSION );
 	}
 	
+	
+	/**
+	 * 
+	 */
+	public static function enqueue_scripts()
+	{
+		wp_enqueue_script( 'apl-ajax', plugins_url('libraries/apl/ajax.js', __FILE__), array('jquery') );
+		wp_enqueue_script( 'apl-list-table-inline-bulk-action', plugins_url('libraries/apl/list-table-inline-bulk-action.js', __FILE__), array('jquery') );
+		wp_enqueue_style( 'connection-hub-main', plugins_url('admin-pages/styles/style.css', __FILE__) );
+	}
 	
 	
 	/**
@@ -123,7 +120,7 @@ class ConnectionsHub_Main
 		if( array_key_exists('synch-connections', $wp->query_vars) )
 		{
 			echo "\nSynching Connections...";
- 			require_once( CONNECTIONS_PLUGIN_PATH . '/classes/synch-connection.php' );
+ 			require_once( CONNECTIONS_HUB_PLUGIN_PATH . '/classes/synch-connection.php' );
  			ConnectionsHub_SynchConnection::synch_all_connections( true );
  			echo "done.\n\n";
 			exit();
