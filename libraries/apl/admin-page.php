@@ -406,7 +406,7 @@ abstract class APL_AdminPage
 	{
 		if( !$this->use_custom_settings )
 		{
-			register_setting( $this->get_name(), $option );
+			register_setting( $this->handler->get_page_name(), $option );
 		}
 	
 		add_filter( 'sanitize_option_'.$option, array($this, 'process_settings'), 10, 2 );
@@ -615,6 +615,8 @@ abstract class APL_AdminPage
 		else
 		{
 			$old_settings = get_option( $option, array() );
+			vtt_print($old_settings);
+			vtt_print($settings);
 			$settings = array_merge( $old_settings, $settings );
 		}
 		
@@ -696,7 +698,7 @@ abstract class APL_AdminPage
 		    >   
 		<?php
 		
-		settings_fields( $this->get_name() );
+		settings_fields( $this->handler->get_page_name() );
 	}
 	
 	
@@ -792,10 +794,15 @@ abstract class APL_AdminPage
 	{
 		$url = apl_get_page_url( false );
 		
-		if( isset($query['page']) )
-			$url .= '?page='.$query['page'];
+		if( is_string($this->menu) )
+			$url .= '?'.parse_url($this->menu, PHP_URL_QUERY).'&';
 		else
-			$url .= '?page='.$this->handler->get_page_name();
+			$url .= '?';
+		
+		if( isset($query['page']) )
+			$url .= 'page='.$query['page'];
+		else
+			$url .= 'page='.$this->handler->get_page_name();
 		
 		if( isset($query['tab']) )
 			$url .= '&tab='.$query['tab'];

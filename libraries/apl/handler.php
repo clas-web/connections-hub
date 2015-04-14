@@ -128,7 +128,6 @@ class APL_Handler
 				break;
 		}
 		
-		
 		if( $this->controller )
 		{
 			add_action( 'admin_init', array($this->controller, 'init') );
@@ -224,7 +223,7 @@ class APL_Handler
 					$this->current_tab = $this->current_page->get_default_tab();
 			}
 		}
-		
+
 		$this->controller = null;
 		if( !$this->current_page )
 		{

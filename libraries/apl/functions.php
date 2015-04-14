@@ -59,6 +59,11 @@ function apl_name()
 	$name = '';
 	$args = func_get_args();
 	
+	if( count($args) === 1 && is_array($args[0]) )
+	{
+		$args = $args[0];
+	}
+	
 	if( count($args) > 0 )
 	{
 		$name .= $args[0];
@@ -101,7 +106,13 @@ function apl_setting_e()
 endif;
 
 
-
+/**
+ * Constructs the name of an input field.
+ * @param   array|{args}  The keys of the input name.  For example:
+ *                          apl_name( 'a', 'b', 'c' ) will return "a[b][c]"
+ *                          apl_name( array( 'a', 'b', 'c' ) ) will return "a[b][c]"
+ * @return  string		The constructed input name. 
+ */
 if( !function_exists('apl_setting') ):
 function apl_setting()
 {
@@ -109,6 +120,11 @@ function apl_setting()
 	
 	$name = '';
 	$args = func_get_args();
+	
+	if( count($args) === 1 && is_array($args[0]) )
+	{
+		$args = $args[0];
+	}
 	
 	if( count($args) > 0 )
 	{
