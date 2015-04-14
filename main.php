@@ -21,10 +21,10 @@ define( 'CONNECTIONS_HUB_PLUGIN_URL', plugins_url('', __FILE__) );
 define( 'CONNECTIONS_HUB_VERSION', '2.5.0' );
 define( 'CONNECTIONS_HUB_DB_VERSION', '1.0' );
 
-define( 'CONNECTIONS_HUB_VERSION_OPTION', 'organization-hub-version' );
-define( 'CONNECTIONS_HUB_DB_VERSION_OPTION', 'organization-hub-db-version' );
+define( 'CONNECTIONS_HUB_VERSION_OPTION', 'connections-hub-version' );
+define( 'CONNECTIONS_HUB_DB_VERSION_OPTION', 'connections-hub-db-version' );
 
-define( 'CONNECTIONS_HUB_OPTIONS', 'organization-hub-options' );
+define( 'CONNECTIONS_HUB_OPTIONS', 'connections-hub-options' );
 define( 'CONNECTIONS_HUB_LOG_FILE', dirname(__FILE__).'/logs/'.date('Ymd-His').'.txt' );
 
 endif;

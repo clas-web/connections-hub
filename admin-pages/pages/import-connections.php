@@ -73,7 +73,7 @@ class ConnectionsHub_ImportConnectionsAdminPage extends APL_AdminPage
 			return;
 		}
 
-		require_once( ORGANIZATION_HUB_PLUGIN_PATH . '/libraries/csv-handler/csv-handler.php' );
+		require_once( CONNECTIONS_HUB_PLUGIN_PATH . '/libraries/csv-handler/csv-handler.php' );
 		
 		// parse the CSV files.
 		$rows = array();
