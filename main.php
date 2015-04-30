@@ -43,6 +43,8 @@ add_action( 'parse_request', array('ConnectionsHub_Main', 'parse_request') );
 
 if( is_admin() )
 {
+	require_once( dirname(__FILE__).'/libraries/apl/apl.php' );
+	
 	add_action( 'admin_enqueue_scripts', array('ConnectionsHub_Main', 'enqueue_scripts') );
 	add_action( 'wp_loaded', array('ConnectionsHub_Main', 'load') );
 	add_action( 'admin_menu', array('ConnectionsHub_Main', 'update'), 5 );
@@ -120,8 +122,9 @@ class ConnectionsHub_Main
 		if( array_key_exists('synch-connections', $wp->query_vars) )
 		{
 			echo "\nSynching Connections...";
- 			require_once( CONNECTIONS_HUB_PLUGIN_PATH . '/classes/synch-connection.php' );
- 			ConnectionsHub_SynchConnection::synch_all_connections( true );
+ 			require_once( CONNECTIONS_HUB_PLUGIN_PATH . '/classes/model/synch-model.php' );
+			$synch_model = ConnectionsHub_SynchModel::get_instance();
+ 			$synch_model->synch_all_connections( true );
  			echo "done.\n\n";
 			exit();
 		}
