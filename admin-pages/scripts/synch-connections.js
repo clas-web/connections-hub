@@ -1,5 +1,23 @@
 
 
+
+jQuery(document).ready(
+	function()
+	{
+		// Setup "Show Only Errors" checkbox.
+		jQuery('#connections-show-only-errors')
+			.change( function() {
+				if( jQuery('#connections-show-only-errors').prop('checked') )
+					jQuery('.post-info.success').hide();
+				else
+					jQuery('.post-info.success').show();
+				return false;
+			});
+	}
+);
+
+
+
 //========================================================================================
 //================================================================ Check Connections =====
 
@@ -277,6 +295,11 @@ function add_post_results( post_id, post_title, success, data )
 		jQuery(post_div).append( jQuery('<div>')
 			.addClass('post-results')
 			.html(data.ajax.message) );
+	}
+	
+	if( jQuery('#connections-show-only-errors').prop('checked') )
+	{
+		jQuery(anchor).hide();
 	}
 	
 	jQuery('#connections-synch-results').prepend( jQuery(div).html() );	

@@ -105,6 +105,10 @@ class ConnectionsHub_SynchConnectionsAdminPage extends APL_AdminPage
 		$this->form_end();
 		
 		?>
+		<div id="connection-synch-filters">
+			<input type="checkbox" id="connections-show-only-errors" />Show only errors
+		</div>
+		
 		<div id="connections-synch-status"></div>
 		<div id="connections-synch-substatus"></div>
 		<div id="connections-synch-results"></div>

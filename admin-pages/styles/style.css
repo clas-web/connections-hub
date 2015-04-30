@@ -72,4 +72,8 @@ body.connection_page_synch-connections #connections-synch-results .post-info .po
 	text-overflow:ellipsis;
 }
 
+body.connection_page_synch-connections #connection-synch-filters {
+	float:right;
+}
+
 
