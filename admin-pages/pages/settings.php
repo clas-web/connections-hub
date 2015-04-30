@@ -68,15 +68,15 @@ class ConnectionsHub_SettingsAdminPage extends APL_AdminPage
 	public function add_settings_fields()
 	{
 		$sections = array( 
-			'connections'		=> 'connections-custom-post-type',
-			'connections-group'	=> 'connections-group-taxonomy',
-			'connections-link'	=> 'connections-link-taxonomy',
+			'connection'	=> 'connections-custom-post-type',
+			'group'			=> 'connections-group-taxonomy',
+			'link'			=> 'connections-link-taxonomy',
 		);
 		$names = array(
-			'full-single'	=> 'Full Single',
-			'full-plural'	=> 'Full Plural',
-			'short-single'	=> 'Short Single',
-			'short-plural'	=> 'Short Plural',
+			'full_single'	=> 'Full Single',
+			'full_plural'	=> 'Full Plural',
+			'short_single'	=> 'Short Single',
+			'short_plural'	=> 'Short Plural',
 			'slug'			=> 'Slug',
 		);
 		
@@ -117,9 +117,63 @@ class ConnectionsHub_SettingsAdminPage extends APL_AdminPage
 			array( CONNECTIONS_HUB_OPTIONS, 'name' ),
 			$args
 		);
+		$current_value = $this->get_connection_setting( $name );
 		?>
 		<input type="text" value="<?php apl_setting_e( $name ); ?>" name="<?php apl_name_e( $name ); ?>">
+		<span class="current-value"><?php echo $current_value; ?></span>
 		<?php
+	}
+	
+	
+	protected function get_connection_setting( $args )
+	{
+		$settings = Connections_ConnectionCustomPostType::get_settings();
+		
+		for( $i = 1; $i < count($args); $i++ )
+		{
+			if( !array_key_exists($args[$i], $settings) ) break;
+		
+			$settings = $settings[$args[$i]];
+		
+			if( count($args) == $i + 1 )
+			{
+				$value = $settings;
+				break;
+			}
+		
+			if( !is_array($settings) ) break;
+		}
+	
+		return $value;	
+	}
+	
+	
+	/**
+	 * Processes the current admin page's Settings API input.
+	 * @param   array   $settings  The inputted settings from the Settings API.
+	 * @param   string  $option    The option key of the settings input array.
+	 * @return  array   The resulted array to store in the db.
+	 */
+	public function process_settings( $settings, $option )
+	{
+		$settings = parent::process_settings( $settings, $option );
+		if( $option !== CONNECTIONS_HUB_OPTIONS ) return $settings;
+		
+		$sections = array( 
+			'connection',
+			'group',
+			'link',
+		);
+		
+		foreach( $settings['name'] as &$section )
+		{
+			foreach( $section as $key => $value )
+			{
+				if( empty($value) ) unset($section[$key]);
+			}
+		}
+		
+		return $settings;
 	}
 	
 	
