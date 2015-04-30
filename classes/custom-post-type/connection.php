@@ -64,13 +64,63 @@ class Connections_ConnectionCustomPostType
 			),
 		);
 
-		$settings = get_option( 'connections_hub_settings', $default );
-// 		ns_print($settings, 'get_settings');
-		$settings = array_merge($default, $settings);
-// 		$settings = $default;
-		
+		$settings = get_option( CONNECTIONS_HUB_OPTIONS, false );
+//		apl_print($settings, 'db setting');
+//		delete_option( CONNECTIONS_HUB_OPTIONS );
+
+		if( $settings === false )
+		{
+			$settings = $default;
+		}
+		elseif( !isset($settings['name']) )
+		{
+			$settings['name'] = $default['name'];
+		}
+		else
+		{
+			foreach( $default['name'] as $section_name => &$section )
+			{
+				if( !isset($settings['name'][$section_name]) )
+				{
+					$settings['name'][$section_name] = $section;
+					continue;
+				}
+				
+				foreach( $section as $sk => $sv )
+				{
+					switch( $sk )
+					{
+						case 'short_single':
+							if( empty($settings['name'][$section_name]['short_single']) )
+							{
+								if( !empty($settings['name'][$section_name]['full_single']) )
+									$settings['name'][$section_name]['short_single'] = $settings['name'][$section_name]['full_single'];
+								else
+									$settings['name'][$section_name]['short_single'] = $default['name'][$section_name]['short_single'];
+							}
+							break;
+						
+						case 'short_plural':
+							if( empty($settings['name'][$section_name]['short_plural']) )
+							{
+								if( !empty($settings['name'][$section_name]['full_plural']) )
+									$settings['name'][$section_name]['short_plural'] = $settings['name'][$section_name]['full_plural'];
+								else
+									$settings['name'][$section_name]['short_plural'] = $default['name'][$section_name]['short_plural'];
+							}
+							break;
+					}
+					
+					if( empty($settings['name'][$section_name][$sk]) )
+						$settings['name'][$section_name][$sk] = $default['name'][$section_name][$sk];
+				}
+			}
+		}
+				
 		self::$_settings = $settings;
-		return $settings;
+//		apl_print(self::$_settings, 'complete settings');
+
+		return self::$_settings;
 	}
 
 	/**
@@ -79,7 +129,7 @@ class Connections_ConnectionCustomPostType
 	public static function create_custom_post()
 	{
 		$settings = self::get_settings();
-// 		ns_print($settings);
+//  	apl_print($settings);
 		
 		extract( $settings['name']['connection'] );
 		
@@ -460,10 +510,11 @@ class Connections_ConnectionCustomPostType
 		//
 		if( !isset($post_data['synch']) ) return;
 		
-		require_once( CONNECTIONS_HUB_PLUGIN_PATH.'/classes/synch-connection.php' );
-		$synch_data = ConnectionsHub_SynchConnection::get_data($post_id);
+		require_once( CONNECTIONS_HUB_PLUGIN_PATH.'/classes/model/synch-model.php' );
+		$synch_model = ConnectionsHub_SynchModel::get_instance();
+		$synch_data = $synch_model->get_data($post_id);
 		if( $synch_data !== false )
-			ConnectionsHub_SynchConnection::synch($post_id, $synch_data);
+			$synch_model->synch($post_id, $synch_data);
 	}
 
 
