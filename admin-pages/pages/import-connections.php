@@ -95,15 +95,13 @@ class ConnectionsHub_ImportConnectionsAdminPage extends APL_AdminPage
 			$urows[$row['username']][] = $row;
 		}
 		
-		$rows = $urows;
-		
 		// process each row of the CSV file.
 		$processed_rows = 0;
 		$count = 1;
 		$errors = '';
-		foreach( $rows as $username => $row )
+		foreach( $urows as $username => $urow )
 		{
-			if( $this->model->add_connection($username, $row) )
+			if( $this->model->add_connection($username, $urow) )
 			{
 				$processed_rows++;
 			}
@@ -117,7 +115,7 @@ class ConnectionsHub_ImportConnectionsAdminPage extends APL_AdminPage
 		// store upload results to display to users.
 		$this->add_notice( 'Upload file: "'.$_FILES['upload']['name'].'".' );
 		$this->add_notice( count($rows) . ' rows found in file.' );
-		$this->add_notice( $count . ' users found in file.' );
+		$this->add_notice( count($urows) . ' users found in file.' );
 		$this->add_notice( $processed_rows . ' users added or updated successfully.' );
 	}
 	
