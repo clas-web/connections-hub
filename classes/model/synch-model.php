@@ -275,7 +275,7 @@ class ConnectionsHub_SynchModel
 	 * @param   string  $url  The url of the Wordpress site.
 	 * @return  string  The output of the plugin.
 	 */
-	private function get_wp_plugin_data( $id, $url )
+	public function get_wp_plugin_data( $id, $url )
 	{
 		// determine the Connections Spoke's url.
 		if( substr($url,-1) !== '/' ) $url .= '/';
@@ -314,7 +314,7 @@ class ConnectionsHub_SynchModel
 	 * @param   string  $url  The url of the Wordpress site.
 	 * @return  string  The content of the page/post of the site.
 	 */
-	private function get_wp_local_post_data( $id, $url )
+	public function get_wp_local_post_data( $id, $url )
 	{
 		global $wpdb;
 		$blog_id = -1;
@@ -424,7 +424,7 @@ class ConnectionsHub_SynchModel
 	 * Parse the content of the widget titled "Contact Me".
 	 * @return  string|null  The string of the "Contact Me" text on success, otherwise null.
 	 */
-	private function get_contact_me_contents()
+	public function get_contact_me_contents()
 	{
 		global $wpdb;
 		
@@ -457,7 +457,7 @@ class ConnectionsHub_SynchModel
 	 * @param   string  $url  The url of the RSS feed.
 	 * @return  string  The content of the main RSS post.
 	 */
-	private function get_rss_feed_data( $id, $url )
+	public function get_rss_feed_data( $id, $url )
 	{
 		return false;
 	}
