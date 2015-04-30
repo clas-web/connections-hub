@@ -230,9 +230,11 @@ class ConnectionsHub_SynchModel
 	{
 		// generate search data based on content.
 		$search_content = '';
+		$content = '';
 		if( isset($data['content']) )
 		{
 			$search_content = Connections_ConnectionCustomPostType::generate_search_data( $data['content'] );
+			$content = $data['content'];
 			unset($data['content']);
 		}
 		
