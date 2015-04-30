@@ -91,7 +91,7 @@ class Connections_ConnectionCustomPostType
 			'edit_item'          => "Edit $full_single",
 			'new_item'           => "New $full_single",
 			'all_items'          => "All $full_plural",
-			'view_item'          => "View $full_plural",
+			'view_item'          => "View $full_single",
 			'search_items'       => "Search $full_plural",
 			'not_found'          => "No $full_plural found",
 			'not_found_in_trash' => "No $full_plural found in the Trash",
