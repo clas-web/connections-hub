@@ -148,12 +148,16 @@ class ConnectionsHub_Model
 			)
 		);
 		
+//		apl_print($connections_post, 'connections_post');
+		
 		// update if post exists, otherwise insert.
 		if( $wpquery->have_posts() )
 		{
+//			apl_print('updating post');
 			$wpquery->the_post();
 			$post = get_post();
 			$connections_post['ID'] = $post->ID;
+			$post_id = $post->ID;
 			$result = wp_update_post( $connections_post, true );
 
 			if( is_wp_error($result) )
@@ -164,13 +168,15 @@ class ConnectionsHub_Model
 		}
 		else
 		{
+//			apl_print('creating post');
 			$result = wp_insert_post( $connections_post, true );
-
+			
 			if( is_wp_error($result) )
 			{
 				$this->model->last_error = 'Unable to insert connection "'.$urow['title'].'". '.$result->get_error_message();
 				return false;
 			}
+			$post_id = $result;
 		}
 		
 		wp_reset_query();
