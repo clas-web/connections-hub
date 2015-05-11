@@ -252,7 +252,7 @@ class APL_Handler
 	 * @return  APL_AdminPage|false  The APL_AdminPage object that matches the page name,
 	 *                               otherwise False.
 	 */
-	protected function get_page( $page_name )
+	public function get_page( $page_name )
 	{
 		foreach( $this->menus as $menu )
 		{
