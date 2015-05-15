@@ -30,6 +30,7 @@ define( 'CONNECTIONS_HUB_LOG_FILE', dirname(__FILE__).'/logs/'.date('Ymd-His').'
 endif;
 
 
+register_activation_hook( __FILE__, array('ConnectionsHub_Main', 'activate_plugin') );
 
 
 require_once( CONNECTIONS_HUB_PLUGIN_PATH.'/classes/model/model.php' );
@@ -41,15 +42,13 @@ require_once( CONNECTIONS_HUB_PLUGIN_PATH.'/classes/widget/random-spotlight-conn
 add_filter( 'query_vars', array('ConnectionsHub_Main', 'query_vars') );
 add_action( 'parse_request', array('ConnectionsHub_Main', 'parse_request') );
 
+
 if( is_admin() )
 {
-	require_once( dirname(__FILE__).'/libraries/apl/apl.php' );
-	
 	add_action( 'admin_enqueue_scripts', array('ConnectionsHub_Main', 'enqueue_scripts') );
 	add_action( 'wp_loaded', array('ConnectionsHub_Main', 'load') );
 	add_action( 'admin_menu', array('ConnectionsHub_Main', 'update'), 5 );
 }
-
 
 
 /**
@@ -57,6 +56,26 @@ if( is_admin() )
  */
 class ConnectionsHub_Main
 {
+
+	/**
+	 * 
+	 */
+	public static function activate_plugin()
+	{
+		if( !defined('APL') || !defined('APL_VERSION') )
+		{
+			deactivate_plugins( plugin_basename( __FILE__ ) );
+			wp_die( 'The '.CONNECTIONS_HUB.' plugin requires the APL library.' );
+		}
+		
+		if( version_compare(APL_VERSION, '1.0') < 0 )
+		{
+			deactivate_plugins( plugin_basename( __FILE__ ) );
+			wp_die( 'The '.CONNECTIONS_HUB.' plugin requires version 1.0 or greater of the APL library.' );
+		}
+	}
+	
+	
 	/**
 	 * 
 	 */
