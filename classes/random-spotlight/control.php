@@ -1,48 +1,135 @@
 <?php
+/*
+Shortcode Example:
+[d3-word-cloud title="My Word Cloud" post-types="post,connection" taxonomies="connection-group,connection-link" minimum-count="1" maximum-words="250" orientation="horizontal" font-family="Georgia" font-size="10,100" font-color="green,blue,black" canvas-size="500,500"]
+*/
 
-add_action('widgets_init',
-     create_function('', 'return register_widget("ConnectionsHub_RandomSpotlightConnectionsWidget");')
-);
 
-class ConnectionsHub_RandomSpotlightConnectionsWidget extends WP_Widget
+require_once( dirname(__FILE__).'/widget-shortcode-control.php' );
+
+
+if( !class_exists('ConnectionHubRandomSpotlight_WidgetShortcodeControl') ):
+class ConnectionHubRandomSpotlight_WidgetShortcodeControl extends WidgetShortcodeControl
 {
-
+	
+	private static $min_items = 1;
+	private static $max_items = 20;
+	
 	/**
-	 * Sets up the widgets name etc
+	 * 
 	 */
 	public function __construct()
 	{
-		// widget actual processes
-		
-		//ns_print('construct');
-		
-		parent::__construct(
-			'connections-hub_random-connections-spotlight-widget',
-			'Connections Spotlight',
-			array( 
-				'description' => 'Display random Connections by tag.', 
-			)
+		$widget_ops = array(
+			'description'	=> 'Display random Connections by tag.',
 		);
+		
+		parent::__construct( 'random-spotlight', 'Connections Spotlight', $widget_ops );
 	}
-
+	
+	
 	/**
-	 * Outputs the content of the widget
 	 *
-	 * @param array $args
-	 * @param array $instance
 	 */
-	public function widget( $args, $instance )
+	public function print_widget_form( $options )
 	{
+		$options = $this->merge_options( $options );
+		extract( $options );
+		?>
+		
+		<p>
+		<label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e( 'Title:' ); ?></label> 
+		<input id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" type="text" value="<?php echo esc_attr( $title ); ?>" class="widefat">
+		</p>
+
+		<p>
+		<label for="<?php echo $this->get_field_id( 'items' ); ?>"><?php _e( 'Number of Spotlights:' ); ?></label> 
+		<select name="<?php echo $this->get_field_name( 'items' ); ?>">
+			<?php for( $i = self::$min_items; $i < self::$max_items+1; $i++ ): ?>
+				<option value="<?php echo $i; ?>" <?php selected($i, $items); ?>><?php echo $i; ?></option>
+			<?php endfor; ?>
+		</select>
+		</p>
+		
+		<?php
+	}
+	
+	
+	/**
+	 *
+	 */
+	public function get_default_options()
+	{
+		$defaults = array();
+		$defaults['title'] = '';
+		$defaults['items'] = 2;
+		
+		return $defaults;
+	}
+	
+	
+	/**
+	 * 
+	 */
+	public function process_shortcode_options( $options )
+	{
+		foreach( $options as $k => &$v )
+		{
+			$v = trim( $v );
+		}
+		
+		if( array_key_exists('items', $options) ) 
+			$options['items'] = intval( $options['items'] );
+		
+		return $options;
+	}
+	
+	
+	/**
+	 * 
+	 * @param   string  $shortcode  The shortcode found the post's content.
+	 * @return  string  The converted shortcode.
+	 */
+	public function print_control( $options, $args = null )
+	{
+		$options = $this->merge_options( $options );
+		if( !$args ) $args = $this->get_args();
+		
+		extract( $options );
+		
 		echo $args['before_widget'];
+		
+		if( !empty($options['title']) )
+			echo $args['before_title'].$options['title'].$args['after_title'];
+		
+		$spotlight_tags = $this->get_spotlight_events( $options['items'] );
+		
+		$count = 0;
+		foreach( $spotlight_tags as $tag )
+		{
+			$this->print_spotlight( $tag, $args );
+			$count++;
+		}
+		
+		while( $count < $options['items'] )
+		{
+			echo 'No spotlights available.';
+		}
 
-		if( !empty($instance['title']) )
-			echo $args['before_title'].$instance['title'].$args['after_title'];
-
-		$tags = get_terms( 'connection-link', array('orderby' => 'count', 'order' => 'DESC') );
-		$number_of_spotlights = intval($instance['number-of-spotlights']);
+		echo $args['after_widget'];	
+	}
+	
+	
+	private function get_spotlight_events( $num_items )
+	{
+		$tags = get_terms(
+			'connection-link',
+			array('orderby' => 'count', 'order' => 'DESC')
+		);
+		$num_items = intval( $num_items );
 		$spotlight_tags = array();
 		
-		for( $i = 0; $i < $number_of_spotlights; $i++ )
+		for( $i = 0; $i < $num_items; $i++ )
 		{
 			if( count($tags) === 0 ) break;
 
@@ -60,91 +147,11 @@ class ConnectionsHub_RandomSpotlightConnectionsWidget extends WP_Widget
 			}
 		}
 		
-		?>
-		<div class="spotlight-connections-widget">
-		<?php
-		
-		$count = 0;
-		foreach( $spotlight_tags as $tag )
-		{
-			$this->print_spotlight( $tag );
-			$count++;
-		}
-		
-		while( $count < $number_of_spotlights )
-		{
-			echo 'No spotlights available.';
-			$count++;
-		}
-
-		?>
-		</div>
-		<?php
-
-		echo $args['after_widget'];
+		return $spotlight_tags;
 	}
-
-	/**
-	 * Ouputs the options form on admin
-	 *
-	 * @param array $instance The widget options
-	 */
-	public function form( $instance )
-	{
-		// outputs the options form on admin
-
-		//ns_print('options of the widget');
-		
-		if( isset($instance['title']) )
-			$title = $instance['title'];
-			
-		if( isset($instance['number-of-spotlights']) )
-			$number_of_spotlights = $instance['number-of-spotlights'];
-		else
-			$number_of_spotlights = 2;
-			
-		$nums = array( 1, 2, 4, 6, 8, 10 );
-		?>
-		
-		<p>
-		<label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e( 'Title:' ); ?></label> 
-		<input class="widefat" id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" type="text" value="<?php echo esc_attr( $title ); ?>">
-		</p>
-
-		<p>
-		<label for="<?php echo $this->get_field_id( 'number-of-spotlights' ); ?>"><?php _e( 'Number of Spotlights:' ); ?></label> 
-		<select name="<?php echo $this->get_field_name( 'number-of-spotlights' ); ?>">
-			<?php foreach( $nums as $n ): ?>
-				<option value="<?php echo $n; ?>" <?php echo ($number_of_spotlights == $n ? 'selected' : ''); ?>><?php echo $n; ?></option>
-			<?php endforeach; ?>
-		</select>
-		</p>
-		
-		<?php
-	}
-
-	/**
-	 * Processing widget options on save
-	 *
-	 * @param array $new_instance The new options
-	 * @param array $old_instance The previous options
-	 */
-	public function update( $new_instance, $old_instance )
-	{
-		// processes widget options to be saved
-		
-		//ns_print($new_instance);
-		//ns_print($old_instance);
-		
-		$instance = array();
-		$instance['title'] = ( ! empty( $new_instance['title'] ) ) ? strip_tags( $new_instance['title'] ) : '';
-		$instance['number-of-spotlights'] = ( ! empty( $new_instance['number-of-spotlights'] ) ) ? strip_tags( intval($new_instance['number-of-spotlights']) ) : 2;
-
-		return $instance;		
-	}
-
-
-	private function print_spotlight( $tag )
+	
+	
+	private function print_spotlight( $tag, $args )
 	{
 		$settings = Connections_ConnectionCustomPostType::get_settings();
 		$connection_links_name = $settings['name']['link']['full_plural'];
@@ -180,8 +187,10 @@ class ConnectionsHub_RandomSpotlightConnectionsWidget extends WP_Widget
 		?>
 		
 		<div class="spotlight-connections">
-		
-		<h2><a href="<?php echo get_term_link($tag->slug, 'connection-link'); ?>" title="<?php echo $tag->name; ?>"><?php echo $tag->name; ?></a></h2>
+
+		<?php echo $args['before_title']; ?>
+		<a href="<?php echo get_term_link($tag->slug, 'connection-link'); ?>" title="<?php echo $tag->name; ?>"><?php echo $tag->name; ?></a>
+		<?php echo $args['after_title']; ?>
 		
 		<?php foreach( $spotlight_posts as $p ): ?>
 		
@@ -226,16 +235,16 @@ class ConnectionsHub_RandomSpotlightConnectionsWidget extends WP_Widget
 			);
 			?>
 			
-			<div class="story clearfix">
+			<div class="post connection clearfix">
 
-				<h3><?php echo $story['title']; ?></h3>
+				<h2><?php echo $story['title']; ?></h2>
 	
 				<div class="connection-groups">
 					<?php foreach( $story['groups'] as $group ): ?>
 					<div><?php echo '<a href="'.$group['link'].'" title="'.$group['name'].'">'.$group['name'].'</a>'; ?></div>
 					<?php endforeach; ?>
 				</div><!-- .connection-groups -->
-	
+				
 				<div class="details clearfix">
 	
 					<div class="column column-1">
@@ -243,8 +252,7 @@ class ConnectionsHub_RandomSpotlightConnectionsWidget extends WP_Widget
 						<div class="links">
 							<?php echo '<a href="'.$story['link'].'" title="View Summary">Summary</a>'; ?>
 							<?php if( $story['site-link'] !== null ): ?>
-							|
-							<?php echo '<a href="'.$story['site-link'].'" title="View Full Profile">Full Profile</a>'; ?>
+								<?php echo '| <a href="'.$story['site-link'].'" title="View Full Profile">Full Profile</a>'; ?>
 							<?php endif; ?>
 						</div><!-- .links -->
 			
@@ -285,5 +293,5 @@ class ConnectionsHub_RandomSpotlightConnectionsWidget extends WP_Widget
 	}
 	
 }
-
+endif;
 

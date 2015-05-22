@@ -36,7 +36,7 @@ register_activation_hook( __FILE__, array('ConnectionsHub_Main', 'activate_plugi
 require_once( CONNECTIONS_HUB_PLUGIN_PATH.'/classes/model/model.php' );
 require_once( CONNECTIONS_HUB_PLUGIN_PATH.'/classes/model/synch-model.php' );
 require_once( CONNECTIONS_HUB_PLUGIN_PATH.'/classes/custom-post-type/connection.php' );
-require_once( CONNECTIONS_HUB_PLUGIN_PATH.'/classes/widget/random-spotlight-connections.php' );
+require_once( CONNECTIONS_HUB_PLUGIN_PATH.'/classes/random-spotlight/main.php' );
 
 
 add_filter( 'query_vars', array('ConnectionsHub_Main', 'query_vars') );
