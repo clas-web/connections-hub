@@ -89,6 +89,8 @@ class ConnectionHubRandomSpotlight_WidgetShortcodeControl extends WidgetShortcod
 	 */
 	public function process_options( $options )
 	{
+		if( $this->control_type == 'widget' ) return $options;
+		
 		foreach( $options as $k => &$v )
 		{
 			$v = trim( $v );
