@@ -159,6 +159,7 @@ class ConnectionsHub_Model
 			$wpquery->the_post();
 			$post = get_post();
 			$connections_post['ID'] = $post->ID;
+			$connections_post['post_content'] = $post->post_content;
 			$post_id = $post->ID;
 			$result = wp_update_post( $connections_post, true );
 
