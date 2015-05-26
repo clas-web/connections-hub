@@ -108,8 +108,10 @@ class ConnectionsHub_Model
 			'post_name'    => $urow['slug'],
 			'post_type'    => 'connection',
 			'post_status'  => 'publish',
-			'post_content' => $urow['content'],
 		);
+		
+		if( isset($urow['content']) )
+			$connections_post['post_content'] = $urow['content'];
 		
 		// get author information by username, if it exists.
 		if( $user = get_user_by( 'login', $username ) )
