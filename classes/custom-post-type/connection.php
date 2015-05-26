@@ -555,9 +555,12 @@ class Connections_ConnectionCustomPostType
 	public static function save_contact_info( $post_id, $phone, $email, $location )
 	{
 		// Save data
-		update_post_meta( $post_id, 'contact-phone', $phone );
-		update_post_meta( $post_id, 'contact-email', $email );
-		update_post_meta( $post_id, 'contact-location', $location );
+		if( $phone !== null )
+			update_post_meta( $post_id, 'contact-phone', $phone );
+		if( $email !== null )
+			update_post_meta( $post_id, 'contact-email', $email );
+		if( $location !== null )
+			update_post_meta( $post_id, 'contact-location', $location );
 	}
 	
 

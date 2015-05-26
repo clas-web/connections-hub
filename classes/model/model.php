@@ -186,9 +186,9 @@ class ConnectionsHub_Model
 		
 		// save the Connections meta data ( sort-title, url, username, site-type ).
 		Connections_ConnectionCustomPostType::save_meta_data( $post_id, $urow['sort-title'], $username, $urow['url'], $urow['site-type'], $urow['entry-method'] );
-		if( empty($urow['phone']) ) $urow['phone'] = '';
-		if( empty($urow['email']) ) $urow['email'] = '';
-		if( empty($urow['location']) ) $urow['location'] = '';
+		if( empty($urow['phone']) ) $urow['phone'] = null;
+		if( empty($urow['email']) ) $urow['email'] = null;
+		if( empty($urow['location']) ) $urow['location'] = null;
 		Connections_ConnectionCustomPostType::save_contact_info( $post_id, $urow['phone'], $urow['email'], $urow['location'] );
 		
 		return true;
