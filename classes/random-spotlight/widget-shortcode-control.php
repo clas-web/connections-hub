@@ -1,34 +1,53 @@
 <?php
-
+/**
+ * WidgetShortcodeControl
+ * 
+ * The WidgetShortcodeControl class for widget and shortcode plugins.
+ * 
+ * @package    WidgetShortcodeControl
+ * @author     Crystal Barton <cbarto11@uncc.edu>
+ */
 
 if( !class_exists('WidgetShortcodeControl') ):
 class WidgetShortcodeControl extends WP_Widget
 {
 	
-	private $index = 0;
+	protected static $index = 0;
+	
+	public $control_type;
+	private $args;
 	
 	
 	/**
-	 *
-	 */
+	 * Constructor.
+	 * Setup the shortcode or widget default properties and actions.
+	 * @param string $id_base         Optional Base ID for the widget, lowercase and unique. If left empty,
+	 *                                a portion of the widget's class name will be used Has to be unique.
+	 * @param string $name            Name for the widget displayed on the configuration page.
+	 * @param array  $widget_options  Optional. Widget options. See {@see wp_register_sidebar_widget()} for
+	 *                                information on accepted arguments. Default empty array.
+	 * @param array  $control_options Optional. Widget control options. See {@see wp_register_widget_control()}
+	 *                                for information on accepted arguments. Default empty array.
+     */
 	public function __construct( $id_base, $name, $widget_ops = null, $control_ops = null )
 	{
 		parent::__construct( $id_base, $name, $widget_ops, $control_ops );
-
+		
+		$this->control_type = 'widget';
 		$this->args = array(
 			'before_widget'	=> '<div id="%1$s" class="widget %2$s">',
 			'after_widget'	=> "</div>\n",
 			'before_title'	=> '<h2 class="title">',
 			'after_title'	=> "</h2>\n",
 		);
-
+		
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
 	}
 	
 	
 	/**
-	 * 
+	 * Registers the Widget Shortcode Control as a WordPress widget.
 	 */
 	public static function register_widget()
 	{
@@ -40,41 +59,61 @@ class WidgetShortcodeControl extends WP_Widget
 	
 	
 	/**
-	 * 
+	 * Registers the Widget Shortcode Control as a WordPress shortcode.
 	 */
 	public static function register_shortcode()
 	{
-		add_filter( 'the_content', array(new static(), 'process_content_shortcode'), 1 );
+		$obj = new static();
+		$obj->control_type = 'shortcode';
+		add_shortcode( str_replace('-','_',$obj->id_base), array($obj, 'shortcode') );
 	}
-
-
+	
+	
 	/**
-	 *
+	 * Enqueues the scripts or styles needed for the control in the admin backend.
 	 */
-	public function admin_enqueue_scripts()
-	{
-	}
+	public function admin_enqueue_scripts() { }
 	
 	
 	/**
-	 *
+	 * Enqueues the scripts or styles needed for the control in the site frontend.
 	 */
-	public function enqueue_scripts()
-	{
-	}
+	public function enqueue_scripts() { }
 	
 	
 	/**
-	 *
+	 * Echo the widget content.
+	 * Override function from WP_Widget parent class.
+	 * @param   array  $args     Display arguments for the widget.
+	 * @param   array  $options  The settings for this instance of the widget.
 	 */
 	public function widget( $args, $options )
 	{
-		$this->print_control( $options, $args );
+		static::$index++;
+		$options = $this->process_options( $options );
+		$this->print_control( $this->merge_options($options), $args );
 	}
 	
 	
 	/**
-	 *
+	 * Echo the shortcode content.
+	 * Called by Shortcode API.
+	 * @param   array  $options  The settings for this shortcode.
+	 */
+	public function shortcode( $options )
+	{
+		static::$index++;
+		$options = $this->process_options( $options );
+		$this->print_control( $this->merge_options($options), $this->get_args() );
+	}
+	
+	
+	/**
+	 * Output the widget form in the admin.
+	 * Replacing with print_widget_form.
+	 * Do not override. Override print_widget_form instead.
+	 * Override function from WP_Widget parent class.
+	 * @param   array   $options  The current settings for the widget.
 	 */
 	public function form( $options )
 	{
@@ -83,7 +122,22 @@ class WidgetShortcodeControl extends WP_Widget
 	
 	
 	/**
-	 *
+	 * Output the widget form in the admin.
+	 * Use this function instead of form.
+	 * @param   array   $options  The current settings for the widget.
+	 */
+	public function print_widget_form( $options )
+	{
+		die('function WidgetShortcodeControl::print_widget_form() must be over-ridden in a sub-class.');
+	}
+	
+	
+	/**
+	 * Update a particular instance.
+	 * Override function from WP_Widget parent class.
+	 * @param   array       $new_options  New options set in the widget form by the user.
+	 * @param   array       $old_options  Old options from the database.
+	 * @return  array|bool  The settings to save, or false to cancel saving.
 	 */
 	public function update( $new_options, $old_options )
 	{
@@ -92,75 +146,20 @@ class WidgetShortcodeControl extends WP_Widget
 	
 	
 	/**
-	 *
+	 * Process options from the database or shortcode.
+	 * Designed to convert options from strings or sanitize output.
+	 * @param   array   $options  The current settings for the widget or shortcode.
+	 * @return  array   The processed settings.
 	 */
-	public function print_widget_form( $options )
-	{
-		parent::form( $options );
-	}
-	
-	
-	/**
-	 *
-	 */
-	public function process_content_shortcode( $content )
-	{
-		$matches = NULL;
-		$num_matches = preg_match_all( "/\[".$this->id_base."(.*)\]/", $content, $matches, PREG_SET_ORDER );
-
-		if( ($num_matches !== FALSE) && ($num_matches > 0) )
-		{
-			for( $i = 0; $i < $num_matches; $i++ )
-			{
-				$this->index = $i;
-				$content = str_replace($matches[$i][0], $this->convert_shortcode( $matches[$i][0] ), $content);
-			}
-		}
-		
-		return $content;
-	}
-	
-	
-	/**
-	 *
-	 */
-	public function convert_shortcode( $shortcode )
-	{
-		$options = array();
-		
-		$matches = NULL;
-		$num_matches = preg_match_all( "/([A-Za-z0-9\-_]+)=\"([^\"]+)\"/", $shortcode, $matches, PREG_SET_ORDER );
-
-		if( ($num_matches !== FALSE) && ($num_matches > 0) )
-		{
-			for( $i = 0; $i < $num_matches; $i++ )
-			{
-				$options[$matches[$i][1]] = $matches[$i][2];
-			}
-		}
-		
-		$options = $this->process_shortcode_options( $options );
-
-		ob_start();
-		$this->print_control( $options );
-		$buffer = ob_get_contents();
-		ob_end_clean();
-		
-		return $buffer;
-	}
-	
-	
-	/**
-	 *
-	 */
-	public function process_shortcode_options( $options )
+	public function process_options( $options )
 	{
 		return $options;
 	}
 	
 	
 	/**
-	 *
+	 * Get the default settings for the widget or shortcode.
+	 * @return  array  The default settings.
 	 */
 	public function get_default_options()
 	{
@@ -169,7 +168,8 @@ class WidgetShortcodeControl extends WP_Widget
 	
 	
 	/**
-	 *
+	 * Gets the default display arguments for the widget or shortcode.
+	 * @return  array  The default display arguments.
 	 */
 	public function get_args()
 	{
@@ -179,7 +179,7 @@ class WidgetShortcodeControl extends WP_Widget
 		{
 			$v = sprintf(
 				$v,
-				$this->id_base.'-s'.$this->index,
+				$this->control_type.'_'.$this->id_base.'-'.static::$index,
 				$this->id_base
 			);
 		}
@@ -189,7 +189,9 @@ class WidgetShortcodeControl extends WP_Widget
 	
 	
 	/**
-	 *
+	 * Merges the default options with the user-entered options.
+	 * @param   array  $options  The user-entered options.
+	 * @return  array  The complete options.
 	 */
 	public function merge_options( $options )
 	{
@@ -198,17 +200,13 @@ class WidgetShortcodeControl extends WP_Widget
 	
 	
 	/**
-	 *
+	 * Echo the widget or shortcode contents.
+	 * @param   array  $options  The current settings for the control.
+	 * @param   array  $args     The display arguments.
 	 */
-	public function print_control( $options, $args = null )
+	public function print_control( $options, $args )
 	{
-		$options = $this->merge_options( $options );
-		if( !$args ) $args = $this->get_args();
-		
-		echo 'options';
-		var_dump($options);
-		echo 'args';
-		var_dump($args);
+		die('function WidgetShortcodeControl::print_control() must be over-ridden in a sub-class.');
 	}
 	
 }

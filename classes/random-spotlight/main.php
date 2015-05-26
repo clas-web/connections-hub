@@ -1,9 +1,9 @@
 <?php
 /*
-Plugin Name: Connections Hub - Random Spotlight
+Plugin Name: Connections Hub: Random Spotlight
 Plugin URI: 
-Description: 
-Version: 0.0.1
+Description: Display up to 5 pairs of Connections posts with matching Connection Links.
+Version: 1.0.0
 Author: Crystal Barton
 Author URI: 
 */

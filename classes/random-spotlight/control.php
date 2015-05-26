@@ -1,8 +1,16 @@
 <?php
-/*
-Shortcode Example:
-[d3-word-cloud title="My Word Cloud" post-types="post,connection" taxonomies="connection-group,connection-link" minimum-count="1" maximum-words="250" orientation="horizontal" font-family="Georgia" font-size="10,100" font-color="green,blue,black" canvas-size="500,500"]
-*/
+/**
+ * ConnectionHubRandomSpotlight_WidgetShortcodeControl
+ * 
+ * The ConnectionHubRandomSpotlight_WidgetShortcodeControl class for the "Connections Hub: Random Spotlight" plugin.
+ * Derived from the official WP RSS widget.
+ * 
+ * Shortcode Example:
+ * [random-spotlight title="My Random Spotlight" items="1"]
+ * 
+ * @package    connections-hub
+ * @author     Crystal Barton <cbarto11@uncc.edu>
+ */
 
 
 require_once( dirname(__FILE__).'/widget-shortcode-control.php' );
@@ -12,11 +20,13 @@ if( !class_exists('ConnectionHubRandomSpotlight_WidgetShortcodeControl') ):
 class ConnectionHubRandomSpotlight_WidgetShortcodeControl extends WidgetShortcodeControl
 {
 	
-	private static $min_items = 1;
-	private static $max_items = 20;
+	private static $MIN_ITEMS = 1;
+	private static $MAX_ITEMS = 20;
+	
 	
 	/**
-	 * 
+	 * Constructor.
+	 * Setup the properties and actions.
 	 */
 	public function __construct()
 	{
@@ -29,7 +39,9 @@ class ConnectionHubRandomSpotlight_WidgetShortcodeControl extends WidgetShortcod
 	
 	
 	/**
-	 *
+	 * Output the widget form in the admin.
+	 * Use this function instead of form.
+	 * @param   array   $options  The current settings for the widget.
 	 */
 	public function print_widget_form( $options )
 	{
@@ -45,7 +57,7 @@ class ConnectionHubRandomSpotlight_WidgetShortcodeControl extends WidgetShortcod
 		<p>
 		<label for="<?php echo $this->get_field_id( 'items' ); ?>"><?php _e( 'Number of Spotlights:' ); ?></label> 
 		<select name="<?php echo $this->get_field_name( 'items' ); ?>">
-			<?php for( $i = self::$min_items; $i < self::$max_items+1; $i++ ): ?>
+			<?php for( $i = self::$MIN_ITEMS; $i < self::$MAX_ITEMS+1; $i++ ): ?>
 				<option value="<?php echo $i; ?>" <?php selected($i, $items); ?>><?php echo $i; ?></option>
 			<?php endfor; ?>
 		</select>
@@ -56,7 +68,8 @@ class ConnectionHubRandomSpotlight_WidgetShortcodeControl extends WidgetShortcod
 	
 	
 	/**
-	 *
+	 * Get the default settings for the widget or shortcode.
+	 * @return  array  The default settings.
 	 */
 	public function get_default_options()
 	{
@@ -69,9 +82,12 @@ class ConnectionHubRandomSpotlight_WidgetShortcodeControl extends WidgetShortcod
 	
 	
 	/**
-	 * 
+	 * Process options from the database or shortcode.
+	 * Designed to convert options from strings or sanitize output.
+	 * @param   array   $options  The current settings for the widget or shortcode.
+	 * @return  array   The processed settings.
 	 */
-	public function process_shortcode_options( $options )
+	public function process_options( $options )
 	{
 		foreach( $options as $k => &$v )
 		{
@@ -86,9 +102,9 @@ class ConnectionHubRandomSpotlight_WidgetShortcodeControl extends WidgetShortcod
 	
 	
 	/**
-	 * 
-	 * @param   string  $shortcode  The shortcode found the post's content.
-	 * @return  string  The converted shortcode.
+	 * Echo the widget or shortcode contents.
+	 * @param   array  $options  The current settings for the control.
+	 * @param   array  $args     The display arguments.
 	 */
 	public function print_control( $options, $args = null )
 	{
@@ -98,6 +114,7 @@ class ConnectionHubRandomSpotlight_WidgetShortcodeControl extends WidgetShortcod
 		extract( $options );
 		
 		echo $args['before_widget'];
+		echo '<div id="random-spotlight-control-'.self::$index.'" class="wscontrol random-spotlight-control">';
 		
 		if( !empty($options['title']) )
 			echo $args['before_title'].$options['title'].$args['after_title'];
@@ -115,11 +132,17 @@ class ConnectionHubRandomSpotlight_WidgetShortcodeControl extends WidgetShortcod
 		{
 			echo 'No spotlights available.';
 		}
-
+		
+		echo '</div>';
 		echo $args['after_widget'];	
 	}
 	
 	
+	/**
+	 * Get an array of tags that have two more associated Connections.
+	 * @param   int    $num_items  The number of pairs of Spotlight Connections to retrieve.
+	 * @return  array  An array of tags that have two or more associated Connections.
+	 */
 	private function get_spotlight_events( $num_items )
 	{
 		$tags = get_terms(
@@ -151,6 +174,11 @@ class ConnectionHubRandomSpotlight_WidgetShortcodeControl extends WidgetShortcod
 	}
 	
 	
+	/**
+	 * Echo a pair of Connection posts that have a matching connection-link.
+	 * @param   string  $tag   The connection-link to use when searching for Connection posts.
+	 * @param   array   $args  The display arguments.
+	 */
 	private function print_spotlight( $tag, $args )
 	{
 		$settings = Connections_ConnectionCustomPostType::get_settings();
