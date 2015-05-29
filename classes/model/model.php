@@ -297,7 +297,98 @@ class ConnectionsHub_Model
 		
 		return $new_taxonomies;
 	}
+	
+	
+	public function get_all_connections()
+	{
+		$connections = get_posts(
+			array(
+				'posts_per_page'	=> -1,
+				'post_type'			=> 'connection',
+			)
+		);
+		
+		$conns = array();
+		$i = 0;
+		foreach( $connections as $cp )
+		{
+			$connection_groups = wp_get_post_terms( $cp->ID, 'connection-group' );
+			$connection_links = wp_get_post_terms( $cp->ID, 'connection-link' );
+			
+			if( is_wp_error($connection_groups) || count($connection_groups) == 0 )
+				$connection_groups = array( '' );
+			
+			foreach( $connection_links as &$link )
+			{
+				$link = $link->name;
+			}
 
+			foreach( $connection_groups as $group )
+			{
+				$conns[$i]['username'] = get_post_meta( $cp->ID, 'username', true );
+
+				$conns[$i]['title'] = $cp->post_title;
+				$conns[$i]['sort-title'] = get_post_meta( $cp->ID, 'sort-title', true );
+				$conns[$i]['slug'] = $cp->post_name;
+				
+//				$conns[$i]['content'] = $cp->post_content;
+//				$conns[$i]['search-content'] = get_post_meta( $cp->ID, 'search-content', true );
+				
+				$conns[$i]['entry-method'] = get_post_meta( $cp->ID, 'entry-method', true );
+				$conns[$i]['site-type'] = get_post_meta( $cp->ID, 'site-type', true );
+				$conns[$i]['url'] = get_post_meta( $cp->ID, 'url', true );
+				
+				$conns[$i]['phone'] = get_post_meta( $cp->ID, 'contact-phone', true );
+				$conns[$i]['email'] = get_post_meta( $cp->ID, 'contact-email', true );
+				$conns[$i]['location'] = get_post_meta( $cp->ID, 'contact-location', true );
+
+				$conns[$i]['connection-group'] = ( is_string($group) ? $group : $group->name );
+				$conns[$i]['connection-link'] = implode( ',', $connection_links );
+				
+				$i++;
+			}
+		}
+		
+		return $conns;
+	}
+
+
+	/**
+	 * Exports a list of Connections to a CSV.
+	 * @param   array   $filter       An array of filter name and values.
+	 * @param   array   $search       An array of search columns and phrases.
+	 * @param   bool    $only_errors  True if filter out OrgHub users with errors.
+	 * @param   string  $orderby      The column to orderby.
+	 */
+	public function csv_export()
+	{
+		$connections = $this->get_all_connections();
+		
+		$headers = array(
+			'username',
+
+			'title',
+			'sort-title',
+			'slug',
+			
+//			'content',
+//			'search-content',
+			
+			'entry-method',
+			'site-type',
+			'url',
+			
+			'phone',
+			'email',
+			'location',
+
+			'connection-group',
+			'connection-link',
+		);
+
+		PHPUtil_CsvHandler::export( 'connections', $headers, $connections );
+		exit;
+	}
 
 } // class ConnectionsHub_Model
 endif; // if( !class_exists('ConnectionsHub_Model') ):

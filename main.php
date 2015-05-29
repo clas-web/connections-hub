@@ -87,6 +87,7 @@ class ConnectionsHub_Main
 		$connhub_pages = new APL_Handler( false );
 
 		$connhub_pages->add_page( new ConnectionsHub_ImportConnectionsAdminPage, 'edit.php?post_type=connection' );
+		$connhub_pages->add_page( new ConnectionsHub_ExportConnectionsAdminPage, 'edit.php?post_type=connection' );
 		$connhub_pages->add_page( new ConnectionsHub_SynchConnectionsAdminPage, 'edit.php?post_type=connection' );
 		$connhub_pages->add_page( new ConnectionsHub_SettingsAdminPage, 'edit.php?post_type=connection' );
 		$connhub_pages->setup();
