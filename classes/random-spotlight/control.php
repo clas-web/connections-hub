@@ -89,15 +89,14 @@ class ConnectionHubRandomSpotlight_WidgetShortcodeControl extends WidgetShortcod
 	 */
 	public function process_options( $options )
 	{
-		if( $this->control_type == 'widget' ) return $options;
-		
+		// trim strings
 		foreach( $options as $k => &$v )
 		{
-			$v = trim( $v );
+			if( is_string($v) ) $v = trim( $v );
 		}
 		
-		if( array_key_exists('items', $options) ) 
-			$options['items'] = intval( $options['items'] );
+		// convert items to an integer
+		$options['items'] = intval( $options['items'] );
 		
 		return $options;
 	}
