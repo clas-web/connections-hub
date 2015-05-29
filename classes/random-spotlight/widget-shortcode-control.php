@@ -90,8 +90,8 @@ class WidgetShortcodeControl extends WP_Widget
 	public function widget( $args, $options )
 	{
 		static::$index++;
-		$options = $this->process_options( $options );
-		$this->print_control( $this->merge_options($options), $args );
+		$options = $this->process_options( $this->merge_options($options) );
+		$this->print_control( $options, $args );
 	}
 	
 	
@@ -103,8 +103,9 @@ class WidgetShortcodeControl extends WP_Widget
 	public function shortcode( $options )
 	{
 		static::$index++;
-		$options = $this->process_options( $options );
-		$this->print_control( $this->merge_options($options), $this->get_args() );
+		if( !is_array($options) ) $options = array();
+		$options = $this->process_options( $this->merge_options($options) );
+		$this->print_control( $options, $this->get_args() );
 	}
 	
 	
