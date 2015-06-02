@@ -35,14 +35,11 @@ class ConnectionsHub_ExportConnectionsAdminPage extends APL_AdminPage
 	 */
 	public function process()
 	{
-		if( !isset($_POST) || !isset($_POST['action']) ) return;
-		
-		switch( $_POST['action'] )
+		switch( $_REQUEST['action'] )
 		{
 			case 'export':
 				require_once( CONNECTIONS_HUB_PLUGIN_PATH . '/libraries/csv-handler/csv-handler.php' );
 				$this->model->csv_export();
-				exit;
 				break;
 		}
 	}
@@ -53,11 +50,13 @@ class ConnectionsHub_ExportConnectionsAdminPage extends APL_AdminPage
 	 */
 	public function display()
 	{
-		$this->form_start_get( 'export', array(), 'export', null );
+		$export_url = $this->get_page_url(
+			array( 'action' => 'export' )
+		);
 		
-		submit_button( 'Export', 'small' );
-		
-		$this->form_end();
+		?>
+		<a href="<?php echo $export_url; ?>">Export</a>
+		<?php
 	}
 	
 	

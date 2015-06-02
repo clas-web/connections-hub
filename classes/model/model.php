@@ -9,17 +9,13 @@
  * @subpackage classes/model
  * @author     Crystal Barton <cbarto11@uncc.edu>
  */
-
 if( !class_exists('ConnectionsHub_Model') ):
 class ConnectionsHub_Model
 {
 	
 	private static $instance = null;	// The only instance of this class.
-
 	public $synch = null;				// The synch model.
-	
-	public $last_error = null;			// The error logged by a model.
-	
+	public $last_error = null;			// The error logged by a model.	
 	
 	
 	/**
@@ -100,7 +96,6 @@ class ConnectionsHub_Model
 		$urow = $urows[0];
 		
 		$urow['slug'] = ( isset($urow['slug']) ? $urow['slug'] : sanitize_title($urow['title']) );
-		$urow['content'] = ( isset($urow['content']) ? $urow['content'] : '' );
 		
 		// set defaults for the Connection post.
 		$connections_post = array(
@@ -110,8 +105,7 @@ class ConnectionsHub_Model
 			'post_status'  => 'publish',
 		);
 		
-		if( isset($urow['content']) )
-			$connections_post['post_content'] = $urow['content'];
+		if( isset($urow['content']) ) $connections_post['post_content'] = $urow['content'];
 		
 		// get author information by username, if it exists.
 		if( $user = get_user_by( 'login', $username ) )
@@ -159,7 +153,7 @@ class ConnectionsHub_Model
 			$wpquery->the_post();
 			$post = get_post();
 			$connections_post['ID'] = $post->ID;
-			$connections_post['post_content'] = $post->post_content;
+			if( !isset($urow['content']) ) $connections_post['post_content'] = $post->post_content;
 			$post_id = $post->ID;
 			$result = wp_update_post( $connections_post, true );
 
@@ -183,6 +177,12 @@ class ConnectionsHub_Model
 		}
 		
 		wp_reset_query();
+		
+		if( isset($connections_post['post_content']) )
+		{
+			$search_content = Connections_ConnectionCustomPostType::generate_search_data( $connections_post['post_content'] );
+			update_post_meta( $post_id, 'search-content', $search_content );
+		}
 		
 		// save the Connections meta data ( sort-title, url, username, site-type ).
 		Connections_ConnectionCustomPostType::save_meta_data( $post_id, $urow['sort-title'], $username, $urow['url'], $urow['site-type'], $urow['entry-method'] );
@@ -331,9 +331,6 @@ class ConnectionsHub_Model
 				$conns[$i]['sort-title'] = get_post_meta( $cp->ID, 'sort-title', true );
 				$conns[$i]['slug'] = $cp->post_name;
 				
-//				$conns[$i]['content'] = $cp->post_content;
-//				$conns[$i]['search-content'] = get_post_meta( $cp->ID, 'search-content', true );
-				
 				$conns[$i]['entry-method'] = get_post_meta( $cp->ID, 'entry-method', true );
 				$conns[$i]['site-type'] = get_post_meta( $cp->ID, 'site-type', true );
 				$conns[$i]['url'] = get_post_meta( $cp->ID, 'url', true );
@@ -344,6 +341,9 @@ class ConnectionsHub_Model
 
 				$conns[$i]['connection-group'] = ( is_string($group) ? $group : $group->name );
 				$conns[$i]['connection-link'] = implode( ',', $connection_links );
+
+				$conns[$i]['content'] = $cp->post_content;
+// 				$conns[$i]['search-content'] = get_post_meta( $cp->ID, 'search-content', true );
 				
 				$i++;
 			}
@@ -371,9 +371,6 @@ class ConnectionsHub_Model
 			'sort-title',
 			'slug',
 			
-//			'content',
-//			'search-content',
-			
 			'entry-method',
 			'site-type',
 			'url',
@@ -384,8 +381,12 @@ class ConnectionsHub_Model
 
 			'connection-group',
 			'connection-link',
-		);
 
+			'content',
+// 			'search-content',
+		);
+		
+		echo 'here';
 		PHPUtil_CsvHandler::export( 'connections', $headers, $connections );
 		exit;
 	}
