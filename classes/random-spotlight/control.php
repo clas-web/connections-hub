@@ -1,4 +1,7 @@
 <?php
+
+require_once( dirname(__FILE__).'/widget-shortcode-control.php' );
+
 /**
  * ConnectionHubRandomSpotlight_WidgetShortcodeControl
  * 
@@ -6,16 +9,11 @@
  * Derived from the official WP RSS widget.
  * 
  * Shortcode Example:
- * [random-spotlight title="My Random Spotlight" items="1"]
+ * [random_spotlight title="My Random Spotlight" items="1"]
  * 
  * @package    connections-hub
  * @author     Crystal Barton <cbarto11@uncc.edu>
  */
-
-
-require_once( dirname(__FILE__).'/widget-shortcode-control.php' );
-
-
 if( !class_exists('ConnectionHubRandomSpotlight_WidgetShortcodeControl') ):
 class ConnectionHubRandomSpotlight_WidgetShortcodeControl extends WidgetShortcodeControl
 {
