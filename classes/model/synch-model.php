@@ -459,7 +459,34 @@ class ConnectionsHub_SynchModel
 	 */
 	public function get_rss_feed_data( $id, $url )
 	{
-		return false;
+		$rss = fetch_feed($url);
+		
+		if( is_wp_error($rss) ) return false;
+		
+		$synch_data = null;
+		if( $rss->get_item_quantity() ) 
+		{
+			$rss_item = $rss->get_item();
+			
+			if( $rss_item )
+			{
+				$content = @html_entity_decode( $rss_item->get_content(), ENT_QUOTES, get_option('blog_charset') );
+				
+				$synch_data = array(
+					'content' => $content,
+					'last-modified' => $rss_item->get_updated_date('U'),
+					'last-author' => $rss_item->get_author(),
+					'view-url' => $rss_item->get_permalink(),
+				);
+			}
+		}
+		
+		$rss->__destruct();
+		unset($rss);
+
+		if( $synch_data === null ) return false;
+
+		return $synch_data;
 	}
 	
 	
