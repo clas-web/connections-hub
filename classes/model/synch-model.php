@@ -279,8 +279,8 @@ class ConnectionsHub_SynchModel
 	{
 		// determine the Connections Spoke's url.
 		if( substr($url,-1) !== '/' ) $url .= '/';
-		$hub = get_bloginfo( 'name' ).'|'.get_permalink( $id );
-		$plugin_page_url = $url . '?connections-spoke-api=get-connections-data&connection-hub='.urlencode($hub);
+		$hub = get_bloginfo( 'name' ).'|'.get_edit_post_link( $id );
+		$plugin_page_url = $url.'?connections-spoke-api=get-connections-data&connections-hub='.urlencode($hub);
 		
 		// contact site for Connections Spoke data.
 		$context = stream_context_create(
