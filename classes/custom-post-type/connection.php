@@ -687,9 +687,14 @@ class Connections_ConnectionCustomPostType
 		{
 			foreach( $data as $key => $value )
 			{
+				if( !is_string($value) )
+					$value = print_r($value, true);
+				
 				if( ($key === 'view-url') && (!empty($value)) )
 					$value = '<a href="'.$value.'" target="_blank">'.$value.'</a>';
+				
 				$key = ucwords( str_replace('-', ' ', $key) );
+				
 				$sd .= '<strong>'.$key.':</strong> '.$value.'<br/>';
 			}
 		}
