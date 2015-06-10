@@ -254,18 +254,21 @@ class ConnectionsHub_SynchModel
 		$contact_info = null;
 		if( isset($data['contact-info']) )
 		{
-			$contact_info = $data['contact-info'];
+			update_post_meta( $connection_post_id, 'contact-info', $data['contact-info'] );
 			unset($data['contact-info']);
+		}
+
+		$contact_info_filter = null;
+		if( isset($data['contact-info-filter']) )
+		{
+			update_post_meta( $connection_post_id, 'contact-info-filter', $data['contact-info-filter'] );
+			unset($data['contact-info-filter']);
 		}
 		
 		// update the Connection post.
 		wp_update_post( array( 'ID' => $connection_post_id, 'post_content' => $content ) );
 		update_post_meta( $connection_post_id, 'search-content', $search_content );
 		update_post_meta( $connection_post_id, 'synch-data', $data );
-		
-		// update the Connection post's contact information, if necessary.
-		if( $contact_info !== null )
-			update_post_meta( $connection_post_id, 'contact-info', $contact_info );
 	}
 
 
@@ -402,6 +405,8 @@ class ConnectionsHub_SynchModel
 					$last_author = apply_filters('the_modified_author', $last_user->display_name);
 			}
 			
+			list( $contact_info, $contact_info_filter ) = self::get_contact_me_args();
+			
 			$synch_data = array(
 				'blog-id' => $blog_id,
 				'post-id' => $wppost->ID,
@@ -409,7 +414,8 @@ class ConnectionsHub_SynchModel
 				'last-modified' => $wppost->post_modified,
 				'last-author' => $last_author,
 				'view-url' => get_permalink($post_id),
-				'contact-info' => self::get_contact_me_contents(),
+				'contact-info' => $contact_info,
+				'contact-info-filter' => $contact_info_filter,
 			);
 		}
 		
@@ -425,7 +431,7 @@ class ConnectionsHub_SynchModel
 	 * Parse the content of the widget titled "Contact Me".
 	 * @return  string|null  The string of the "Contact Me" text on success, otherwise null.
 	 */
-	public function get_contact_me_contents()
+	public function get_contact_me_args()
 	{
 		global $wpdb;
 		
@@ -440,15 +446,14 @@ class ConnectionsHub_SynchModel
 			if( (isset($widget['title'])) && ($widget['title'] == 'Contact Me') )
 			{
 				$text = $widget['text'];
-				
-				if( $widget['filter'] )
-					$text = wpautop($text);
+				$filter = 'no';
+				if( $widget['filter'] ) $filter = 'yes';
 
 				break;
 			}
 		}
 		
-		return $text;
+		return array( $text, $filter );
 	}	
 	
 	

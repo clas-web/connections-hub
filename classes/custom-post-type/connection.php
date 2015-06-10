@@ -359,40 +359,24 @@ class Connections_ConnectionCustomPostType
 	public static function info_box_contact_info( $post )
 	{
 		$entry_method = self::get_entry_method( $post->ID );
-
-		if( $entry_method == 'synch' )
-		{
-			$contact_info = get_post_meta($post->ID, 'contact-info', true);
-			if( empty($contact_info) ) $contact_info = 'No contact info.';
-
-			?>
-			<div class="contact-info"><?php echo $contact_info; ?></div>
-			<?php
-		}
-		else
-		{
-			$contact_phone = get_post_meta($post->ID, 'contact-phone', true);
-			$contact_email = get_post_meta($post->ID, 'contact-email', true);
-			$contact_location = get_post_meta($post->ID, 'contact-location', true);
-			
-			?>
-			<div class="contact-info">
-			<label for="connections-contact-location">Location</label><br/>
-			<input type="text" id="connections-contact-location" name="connections-contact-location" value="<?php echo esc_attr($contact_location); ?>" style="width:100%" /><br/>
-			<label for="connections-contact-phone">Phone</label><br/>
-			<input type="text" id="connections-contact-phone" name="connections-contact-phone" value="<?php echo esc_attr($contact_phone); ?>" style="width:100%" /><br/>
-			<label for="connections-contact-email">Email</label><br/>
-			<input type="text" id="connections-contact-email" name="connections-contact-email" value="<?php echo esc_attr($contact_email); ?>" style="width:100%" /><br/>
-			</div>
-			<?php
-		}
-		?>
-
+		$contact_info = get_post_meta($post->ID, 'contact-info', true);
+		$contact_info_filter = get_post_meta($post->ID, 'contact-info-filter', true);
 		
+		$disabled = '';
+		if( $entry_method != 'manual' ) $disabled = 'disabled';
+
+		echo '<div class="contact-info">';
+		
+		if( $entry_method == 'synch' && empty($contact_info) ) 
+			$contact_info = 'No contact info.';
+
+		?>
+		<textarea name="connections-contact-info" style="width:100%;height:200px;" <?php echo $disabled; ?>><?php echo $contact_info; ?></textarea>
+		<input type="checkbox" name="connections-contact-info-filter" <?php checked( 'yes', $contact_info_filter ); ?> <?php echo $disabled; ?> />
+		Automatically add paragraphs
 		<?php
-
-
-
+		
+		echo '</div>';
 	}
 	
 	
@@ -467,8 +451,6 @@ class Connections_ConnectionCustomPostType
 		switch( $entry_method )
 		{
 			case( 'synch' ):
-				// save sort title, username, url, site type
-				// save entry method
 				self::save_meta_data(
 					$post_id,
 					$post_data['connections-sort-title'],
@@ -481,10 +463,6 @@ class Connections_ConnectionCustomPostType
 				
 			case( 'manual' ):
 			default:
-				// create search content and save
-				// save sort title and username
-				// save contact phone, email, location
-				// save entry method
 				self::save_meta_data(
 					$post_id,
 					$post_data['connections-sort-title'],
@@ -493,12 +471,8 @@ class Connections_ConnectionCustomPostType
 					null,
 					$post_data['connection-entry-method-type']
 				);
-				self::save_contact_info(
-					$post_id,
-					$post_data['connections-contact-phone'],
-					$post_data['connections-contact-email'],
-					$post_data['connections-contact-location']
-				);
+				update_post_meta( $post_id, 'contact-info', $post_data['connections-contact-info'] );
+				update_post_meta( $post_id, 'contact-info-filter', $post_data['connections-contact-info-filter'] );
 				$search_content = self::generate_search_data( $post_data['content'] );
 				update_post_meta( $post_id, 'search-content', $search_content );
 				break;
@@ -552,18 +526,6 @@ class Connections_ConnectionCustomPostType
 	}
 	
 	
-	public static function save_contact_info( $post_id, $phone, $email, $location )
-	{
-		// Save data
-		if( $phone !== null )
-			update_post_meta( $post_id, 'contact-phone', $phone );
-		if( $email !== null )
-			update_post_meta( $post_id, 'contact-email', $email );
-		if( $location !== null )
-			update_post_meta( $post_id, 'contact-location', $location );
-	}
-	
-
 	public static function alter_connection_query( $wp_query )
 	{
 		if( !is_admin() ) return;
@@ -607,15 +569,11 @@ class Connections_ConnectionCustomPostType
 
 		/*
 		-connections links
-		-email address
-		-phone number
-		-location
+		-contact info
 		*/
 		
 // 		$columns['taxonomy-connection-link'] = 'Connection Links';
-		$columns['email'] = 'Email';
-		$columns['phone'] = 'Phone';
-		$columns['location'] = 'Location';
+		$columns['contact-info'] = 'Contact Info';
 		
 		return $columns;
 	}
@@ -656,19 +614,13 @@ class Connections_ConnectionCustomPostType
 				}
 				break;
 			
-			case 'email':
-				$contact_email = get_post_meta($post_id, 'contact-email', true);
-				echo $contact_email;
-				break;
-			
-			case 'phone':
-				$contact_phone = get_post_meta($post_id, 'contact-phone', true);
-				echo $contact_phone;
-				break;
-			
-			case 'location':
-				$contact_location = get_post_meta($post_id, 'contact-location', true);
-				echo $contact_location;
+			case 'contact-info':
+				$contact_info = get_post_meta($post_id, 'contact-info', true);
+				
+				if( get_post_meta($post_id, 'contact-info-filter', true) == 'yes' )
+					$contact_info = wpautop( $contact_info );
+				
+				echo $contact_info;
 				break;
 		}
 	}

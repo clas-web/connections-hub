@@ -186,10 +186,10 @@ class ConnectionsHub_Model
 		
 		// save the Connections meta data ( sort-title, url, username, site-type ).
 		Connections_ConnectionCustomPostType::save_meta_data( $post_id, $urow['sort-title'], $username, $urow['url'], $urow['site-type'], $urow['entry-method'] );
-		if( empty($urow['phone']) ) $urow['phone'] = null;
-		if( empty($urow['email']) ) $urow['email'] = null;
-		if( empty($urow['location']) ) $urow['location'] = null;
-		Connections_ConnectionCustomPostType::save_contact_info( $post_id, $urow['phone'], $urow['email'], $urow['location'] );
+		
+		// save the contact info.
+		if( isset($urow['contact-info']) ) update_post_meta( $post_id, 'contact-info', $urow['contact-info'] );
+		update_post_meta( $post_id, 'contact-info-filter', 'yes' );
 		
 		return true;
 	}
@@ -326,7 +326,7 @@ class ConnectionsHub_Model
 			foreach( $connection_groups as $group )
 			{
 				$conns[$i]['username'] = get_post_meta( $cp->ID, 'username', true );
-
+				
 				$conns[$i]['title'] = $cp->post_title;
 				$conns[$i]['sort-title'] = get_post_meta( $cp->ID, 'sort-title', true );
 				$conns[$i]['slug'] = $cp->post_name;
@@ -335,13 +335,11 @@ class ConnectionsHub_Model
 				$conns[$i]['site-type'] = get_post_meta( $cp->ID, 'site-type', true );
 				$conns[$i]['url'] = get_post_meta( $cp->ID, 'url', true );
 				
-				$conns[$i]['phone'] = get_post_meta( $cp->ID, 'contact-phone', true );
-				$conns[$i]['email'] = get_post_meta( $cp->ID, 'contact-email', true );
-				$conns[$i]['location'] = get_post_meta( $cp->ID, 'contact-location', true );
-
+				$conns[$i]['contact-info'] = get_post_meta( $cp->ID, 'contact-info', true );
+				
 				$conns[$i]['connection-group'] = ( is_string($group) ? $group : $group->name );
 				$conns[$i]['connection-link'] = implode( ',', $connection_links );
-
+				
 				$conns[$i]['content'] = $cp->post_content;
 // 				$conns[$i]['search-content'] = get_post_meta( $cp->ID, 'search-content', true );
 				
@@ -366,7 +364,7 @@ class ConnectionsHub_Model
 		
 		$headers = array(
 			'username',
-
+			
 			'title',
 			'sort-title',
 			'slug',
@@ -375,18 +373,15 @@ class ConnectionsHub_Model
 			'site-type',
 			'url',
 			
-			'phone',
-			'email',
-			'location',
-
+			'contact-info',
+			
 			'connection-group',
 			'connection-link',
-
+			
 			'content',
 // 			'search-content',
 		);
 		
-		echo 'here';
 		PHPUtil_CsvHandler::export( 'connections', $headers, $connections );
 		exit;
 	}
