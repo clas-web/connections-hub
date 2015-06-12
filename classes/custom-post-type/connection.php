@@ -372,7 +372,8 @@ class Connections_ConnectionCustomPostType
 
 		?>
 		<textarea name="connections-contact-info" style="width:100%;height:200px;" <?php echo $disabled; ?>><?php echo $contact_info; ?></textarea>
-		<input type="checkbox" name="connections-contact-info-filter" <?php checked( 'yes', $contact_info_filter ); ?> <?php echo $disabled; ?> />
+		<input type="hidden" name="connections-contact-info-filter" value="no" />
+		<input type="checkbox" name="connections-contact-info-filter" value="yes" <?php checked( 'yes', $contact_info_filter ); ?> <?php echo $disabled; ?> />
 		Automatically add paragraphs
 		<?php
 		
