@@ -477,11 +477,13 @@ class ConnectionsHub_SynchModel
 			if( $rss_item )
 			{
 				$content = @html_entity_decode( $rss_item->get_content(), ENT_QUOTES, get_option('blog_charset') );
+				$author = $rss_item->get_author();
+				$author = ( $author ? $author->name : 'No author given' );
 				
 				$synch_data = array(
 					'content' => $content,
 					'last-modified' => $rss_item->get_updated_date('U'),
-					'last-author' => $rss_item->get_author(),
+					'last-author' => $author,
 					'view-url' => $rss_item->get_permalink(),
 				);
 			}
