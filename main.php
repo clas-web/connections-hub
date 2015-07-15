@@ -42,11 +42,11 @@ require_once( CONNECTIONS_HUB_PLUGIN_PATH.'/classes/random-spotlight/main.php' )
 add_filter( 'query_vars', array('ConnectionsHub_Main', 'query_vars') );
 add_action( 'parse_request', array('ConnectionsHub_Main', 'parse_request') );
 
+add_action( 'wp_enqueue_scripts', array('ConnectionsHub_Main', 'enqueue_scripts') );
 
 if( is_admin() )
 {
 	add_action( 'admin_enqueue_scripts', array('ConnectionsHub_Main', 'admin_enqueue_scripts') );
-	add_action( 'admin_enqueue_scripts', array('ConnectionsHub_Main', 'enqueue_scripts') );
 	add_action( 'wp_loaded', array('ConnectionsHub_Main', 'load') );
 	add_action( 'admin_menu', array('ConnectionsHub_Main', 'update'), 5 );
 }

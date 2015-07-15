@@ -277,6 +277,9 @@ class ConnectionHubRandomSpotlight_WidgetShortcodeControl extends WidgetShortcod
 					<?php endforeach; ?>
 				</div><!-- .connection-groups -->
 				
+				<div class="entry-content">
+				<div>
+
 					<div class="column column-1">
 		
 						<div class="links">
@@ -294,24 +297,29 @@ class ConnectionHubRandomSpotlight_WidgetShortcodeControl extends WidgetShortcod
 		
 					<div class="column column-2">
 		
-						<h5><?php echo $settings['link']['full_single']; ?></h5>
+						<h5><?php echo $connection_links_name; ?></h5>
 						
 						<?php $count = 1; ?>
 						<div class="connection-links columns-<?php echo count($links); ?>">
-							<div>
+						<div>
 							<?php foreach( $links as $link_column ): ?>
 							<div>
-							<?php foreach( $link_column as $link ): ?>
-							<div><?php echo vtt_get_anchor( $link['link'], $link['class'], null, $link['name'] ); ?></div>
-							<?php endforeach; ?>
+								<?php foreach( $link_column as $link ): ?>
+								<div>
+								<?php echo vtt_get_anchor( $link['link'], $link['class'], null, $link['name'] ); ?>
+								</div>	
+								<?php endforeach; ?>
 							</div>
 							<?php $count++; ?>
 							<?php endforeach; ?>
-							</div>
+						</div>
 						</div><!-- .connection-links -->
 		
 					</div><!-- .column-2 -->
-	
+
+				</div>				
+				</div><!-- .entry-content -->
+
 				</div><!-- .details -->
 	
 			</a>
