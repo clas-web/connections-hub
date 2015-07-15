@@ -119,6 +119,7 @@ class ConnectionHubRandomSpotlight_WidgetShortcodeControl extends WidgetShortcod
 			echo $args['before_title'].$options['title'].$args['after_title'];
 		
 		$spotlight_tags = $this->get_spotlight_events( $options['items'] );
+//		var_dump( $spotlight_tags );
 		
 		$count = 0;
 		foreach( $spotlight_tags as $tag )
@@ -130,6 +131,7 @@ class ConnectionHubRandomSpotlight_WidgetShortcodeControl extends WidgetShortcod
 		while( $count < $options['items'] )
 		{
 			echo 'No spotlights available.';
+			$count++;
 		}
 		
 		echo '</div>';
@@ -247,61 +249,65 @@ class ConnectionHubRandomSpotlight_WidgetShortcodeControl extends WidgetShortcod
 			if( filter_var($site_link, FILTER_VALIDATE_URL) === false )
 				$site_link = null;
 		
-			$story = array();
-			$story['title'] = $p->post_title;
-			$story['post-content'] = apply_filters( 'get_the_content', $p->post_content );
-			$story['contact-info'] = get_post_meta( $p->ID, 'contact-info', true );
-			$story['groups'] = $connection_groups;
-			$story['links'] = $connection_links;
-			$story['link'] = get_permalink($p->ID);
-			$story['site-link'] = $site_link;
+			$conn = array();
+			$conn['ID'] = $p->ID;
+			$conn['title'] = $p->post_title;
+			$conn['post-content'] = apply_filters( 'get_the_content', $p->post_content );
+			$conn['contact-info'] = get_post_meta( $p->ID, 'contact-info', true );
+			$conn['groups'] = $connection_groups;
+			$conn['links'] = $connection_links;
+			$conn['link'] = get_permalink($p->ID);
+			$conn['site-link'] = $site_link;
 
 			$links = array(
 				 array_slice( $connection_links, 0, ceil(count($connection_links) / 2) ),
 				 array_slice( $connection_links, ceil(count($connection_links) / 2) )
 			);
 			?>
-			
-			<div class="post connection clearfix">
 
-				<h2><?php echo $story['title']; ?></h2>
+			<div class="post connection">
+
+				<h2 class="entry-title"><a href="<?php echo get_permalink($conn['ID']); ?>"><?php echo $conn['title']; ?></a></h2>
 	
+				<div class="description">
+				
 				<div class="connection-groups">
-					<?php foreach( $story['groups'] as $group ): ?>
+					<?php foreach( $conn['groups'] as $group ): ?>
 					<div><?php echo '<a href="'.$group['link'].'" title="'.$group['name'].'">'.$group['name'].'</a>'; ?></div>
 					<?php endforeach; ?>
 				</div><!-- .connection-groups -->
 				
-				<div class="details clearfix">
-	
 					<div class="column column-1">
 		
 						<div class="links">
-							<?php echo '<a href="'.$story['link'].'" title="View Summary">Summary</a>'; ?>
-							<?php if( $story['site-link'] !== null ): ?>
-								<?php echo '| <a href="'.$story['site-link'].'" title="View Full Profile">Full Profile</a>'; ?>
+							<?php echo '<a href="'.$conn['link'].'" title="View Summary">Summary</a>'; ?>
+							<?php if( $conn['site-link'] !== null ): ?>
+								<?php echo '| <a href="'.$conn['site-link'].'" title="View Full Profile">Full Profile</a>'; ?>
 							<?php endif; ?>
 						</div><!-- .links -->
 			
 						<div class="contact-info">
-							<?php echo $story['contact-info']; ?>
+							<?php echo $conn['contact-info']; ?>
 						</div><!-- .contact-info -->
 		
 					</div><!-- .column-1 -->
 		
 					<div class="column column-2">
 		
+						<h5><?php echo $settings['link']['full_single']; ?></h5>
+						
 						<?php $count = 1; ?>
-						<div class="connection-links columns-<?php echo count($links); ?> clearfix">
-							<h5><?php echo $connection_links_name; ?></h5>
+						<div class="connection-links columns-<?php echo count($links); ?>">
+							<div>
 							<?php foreach( $links as $link_column ): ?>
-							<div class="column column-<?php echo $count; ?>">
+							<div>
 							<?php foreach( $link_column as $link ): ?>
-							<div><?php echo '<a href="'.$link['link'].'" title="'.$link['name'].'">'.$link['name'].'</a>'; ?></div>
+							<div><?php echo vtt_get_anchor( $link['link'], $link['class'], null, $link['name'] ); ?></div>
 							<?php endforeach; ?>
 							</div>
 							<?php $count++; ?>
 							<?php endforeach; ?>
+							</div>
 						</div><!-- .connection-links -->
 		
 					</div><!-- .column-2 -->
@@ -309,7 +315,7 @@ class ConnectionHubRandomSpotlight_WidgetShortcodeControl extends WidgetShortcod
 				</div><!-- .details -->
 	
 			</a>
-			</div><!-- .story -->
+			</div><!-- .post -->
 			
 		<?php endforeach; ?>
 		

@@ -45,6 +45,7 @@ add_action( 'parse_request', array('ConnectionsHub_Main', 'parse_request') );
 
 if( is_admin() )
 {
+	add_action( 'admin_enqueue_scripts', array('ConnectionsHub_Main', 'admin_enqueue_scripts') );
 	add_action( 'admin_enqueue_scripts', array('ConnectionsHub_Main', 'enqueue_scripts') );
 	add_action( 'wp_loaded', array('ConnectionsHub_Main', 'load') );
 	add_action( 'admin_menu', array('ConnectionsHub_Main', 'update'), 5 );
@@ -114,9 +115,18 @@ class ConnectionsHub_Main
 	/**
 	 * 
 	 */
-	public static function enqueue_scripts()
+	public static function admin_enqueue_scripts()
 	{
 		wp_enqueue_style( 'connection-hub-main', plugins_url('admin-pages/styles/style.css', __FILE__) );
+	}
+	
+	
+	/**
+	 * 
+	 */
+	public static function enqueue_scripts()
+	{
+		wp_enqueue_style( 'connection-hub-main', plugins_url('style.css', __FILE__) );
 	}
 	
 	
