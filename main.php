@@ -33,6 +33,7 @@ endif;
 register_activation_hook( __FILE__, array('ConnectionsHub_Main', 'activate_plugin') );
 
 
+require_once( CONNECTIONS_HUB_PLUGIN_PATH.'/functions.php' );
 require_once( CONNECTIONS_HUB_PLUGIN_PATH.'/classes/model/model.php' );
 require_once( CONNECTIONS_HUB_PLUGIN_PATH.'/classes/model/synch-model.php' );
 require_once( CONNECTIONS_HUB_PLUGIN_PATH.'/classes/custom-post-type/connection.php' );
