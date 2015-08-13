@@ -1,23 +1,23 @@
 <?php
 /**
- * ConnectionsHub_ExportConnectionsAdminPage
- * 
- * This class controls the admin page "Export Connections".
+ * Controls the admin page "Export Connections".
  * 
  * @package    connection-hub
  * @subpackage admin-pages/pages
- * @author     Crystal Barton <cbarto11@uncc.edu>
+ * @author     Crystal Barton <atrus1701@gmail.com>
  */
-
 if( !class_exists('ConnectionsHub_ExportConnectionsAdminPage') ):
 class ConnectionsHub_ExportConnectionsAdminPage extends APL_AdminPage
 {
-	
+	/**
+	 * The main model for the Connections Hub plugin.
+	 * @var  ConnectionsHub_Model
+	 */
 	private $model = null;	
 	
 	
 	/**
-	 * Creates an ConnectionsHub_ExportConnectionsAdminPage object.
+	 * Controller.
 	 */
 	public function __construct(
 		$name = 'export-connections',
@@ -58,7 +58,6 @@ class ConnectionsHub_ExportConnectionsAdminPage extends APL_AdminPage
 		<a href="<?php echo $export_url; ?>">Export</a>
 		<?php
 	}
-	
 	
 } // class ConnectionsHub_ExportConnectionsAdminPage extends APL_AdminPage
 endif; // if( !class_exists('ConnectionsHub_ExportConnectionsAdminPage') )

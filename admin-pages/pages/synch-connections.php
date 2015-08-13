@@ -5,25 +5,24 @@ if( !class_exists('ConnectionsHub_SynchListTable') )
 
 
 /**
- * ConnectionsHub_SynchConnectionsAdminPage
- * 
- * This class controls the admin page "Synch Connections".
+ * Controls the admin page "Synch Connections".
  * 
  * @package    connection-hub
  * @subpackage admin-pages/pages
- * @author     Crystal Barton <cbarto11@uncc.edu>
+ * @author     Crystal Barton <atrus1701@gmail.com>
  */
-
 if( !class_exists('ConnectionsHub_SynchConnectionsAdminPage') ):
 class ConnectionsHub_SynchConnectionsAdminPage extends APL_AdminPage
 {
-	
+	/**
+	 * The main model for the Connections Hub plugin.
+	 * @var  ConnectionsHub_Model
+	 */
 	private $model = null;	
-// 	private $list_table = null;
 	
 	
 	/**
-	 * Creates an ConnectionsHub_SynchConnections object.
+	 * Controller.
 	 */
 	public function __construct(
 		$name = 'synch-connections',
@@ -41,7 +40,6 @@ class ConnectionsHub_SynchConnectionsAdminPage extends APL_AdminPage
 	 */
 	public function init()
 	{
-// 		$this->list_table = new ConnectionsHub_SynchListTable( $this );
 	}
 	
 	
@@ -50,7 +48,6 @@ class ConnectionsHub_SynchConnectionsAdminPage extends APL_AdminPage
 	 */
 	public function load()
 	{
-// 		$this->list_table->load();
 	}
 
 
@@ -59,7 +56,7 @@ class ConnectionsHub_SynchConnectionsAdminPage extends APL_AdminPage
 	 */
 	public function enqueue_scripts()
 	{
-		wp_enqueue_script('synch-connections', CONNECTIONS_HUB_PLUGIN_URL.'/admin-pages/scripts/synch-connections.js', array('jquery'));
+		wp_enqueue_script( 'synch-connections', CONNECTIONS_HUB_PLUGIN_URL.'/admin-pages/scripts/synch-connections.js', array('jquery') );
 	}
 	
 	
@@ -76,8 +73,6 @@ class ConnectionsHub_SynchConnectionsAdminPage extends APL_AdminPage
 	 */
 	public function display()
 	{
-// 		$this->list_table->prepare_items();
-
 		$this->form_start_get( 'check', null, 'check' );
 			$this->create_ajax_submit_button(
 				'Check Connections',
@@ -113,19 +108,15 @@ class ConnectionsHub_SynchConnectionsAdminPage extends APL_AdminPage
 		<div id="connections-synch-substatus"></div>
 		<div id="connections-synch-results"></div>
 		<?php
-		
-// 		$this->form_start( 'synch-connections-table' );
-// 			$this->list_table->display();
-// 		$this->form_end();
 	}
 
 
 	/**
 	 * Processes and displays the output of an ajax request.
 	 * @param  string  $action  The AJAX action.
-	 * @param  array   $input   The AJAX input array.
-	 * @param  int     $count   When multiple AJAX calls are made, the current count.
-	 * @param  int     $total   When multiple AJAX calls are made, the total count.
+	 * @param  array  $input  The AJAX input array.
+	 * @param  int  $count  When multiple AJAX calls are made, the current count.
+	 * @param  int  $total  When multiple AJAX calls are made, the total count.
 	 */
 	public function ajax_request( $action, $input, $count, $total )
 	{
@@ -215,8 +206,7 @@ class ConnectionsHub_SynchConnectionsAdminPage extends APL_AdminPage
 				break;
 		}
 	}
-	
-	
+
 } // class ConnectionsHub_SynchConnectionsAdminPage extends APL_AdminPage
 endif; // if( !class_exists('ConnectionsHub_SynchConnectionsAdminPage') )
 

@@ -5,17 +5,29 @@ if( !class_exists('WP_List_Table') )
 
 
 /**
+ * The WP_List_Table class for the Connections Synch table.
  * 
+ * @package    connections-hub
+ * @author     Crystal Barton <atrus1701@gmail.com>
  */
+if( !class_exists('ConnectionsHub_SynchListTable') ):
 class ConnectionsHub_SynchListTable extends WP_List_Table
 {
-	private $parent;		// The parent admin page.
-	private $model;			// The main model.
+	/**
+	 * The admin page that contains the list table.
+	 * @var  APL_AdminPage
+	 */
+	private $parent;
+
+	/**
+	 * The main model for the Connections Hub.
+	 * @var  ConnectionsHub_Model
+	 */
+	private $model;
 	
 	
 	/**
 	 * Constructor.
-	 * Creates an ConnectionsHub_SynchListTable object.
 	 */
 	public function __construct( $parent )
 	{
@@ -55,7 +67,10 @@ class ConnectionsHub_SynchListTable extends WP_List_Table
 	
 	
 	/**
-	 * 
+	 * Sort Connections by a column value by comparing two Connections.
+	 * @param  array  $a  Connections post 1.
+	 * @param  array  $b  Connections post 2.
+	 * @return  int  -1 if post 1 is greater than post 2, 1 if vice versa, 0 if equal.
 	 */
 	function sort_data( $a, $b )
 	{
@@ -121,7 +136,10 @@ class ConnectionsHub_SynchListTable extends WP_List_Table
 	
 	
 	/**
-	 * 
+	 * Generate content for a cell.
+	 * @param  Array  $item  The current Connections post's data.
+	 * @param  string  $column_name  The name of the column.
+	 * @return  string  The generated html for the cell.
 	 */
 	function column_default( $item, $column_name )
 	{
@@ -130,7 +148,9 @@ class ConnectionsHub_SynchListTable extends WP_List_Table
 	
 
 	/**
-	 * 
+	 * Generate content for the name column for each Connection.
+	 * @param  Array  $item  The current Connections post's data.
+	 * @return  string  The generated html for the cell.
 	 */
 	function column_name( $item )
 	{
@@ -157,7 +177,9 @@ class ConnectionsHub_SynchListTable extends WP_List_Table
 	
 
 	/**
-	 * 
+	 * Generate content for the synch column for each Connection.
+	 * @param  Array  $item  The current Connections post's data.
+	 * @return  string  The generated html for the cell.
 	 */
 	function column_synch( $item )
 	{
@@ -166,7 +188,9 @@ class ConnectionsHub_SynchListTable extends WP_List_Table
 	
 
 	/**
-	 * 
+	 * Generate content for the status column for each Connection.
+	 * @param  Array  $item  The current Connections post's data.
+	 * @return  string  The generated html for the cell.
 	 */
 	function column_status( $item )
 	{
@@ -184,6 +208,6 @@ class ConnectionsHub_SynchListTable extends WP_List_Table
 		
 		return $form;
 	}
-
 }
+endif;
 

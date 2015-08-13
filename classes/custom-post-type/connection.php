@@ -1,8 +1,4 @@
 <?php
-/**
- * 
- */
-
 
 
 add_action( 'init', array( 'Connections_ConnectionCustomPostType', 'create_custom_post' ) );
@@ -13,27 +9,38 @@ add_action( 'add_meta_boxes', array( 'Connections_ConnectionCustomPostType', 'ad
 add_action( 'save_post_connection', array( 'Connections_ConnectionCustomPostType', 'save_post_entry_form' ), 9999, 3 );
 
 // All Connections changes
-//add_filter( 'pre_get_posts', array('Connections_ConnectionCustomPostType', 'alter_connections_query') );
 add_filter( 'views_edit-connection', array( 'Connections_ConnectionCustomPostType', 'all_connections_add_synch_button' ) );
 add_filter( 'manage_edit-connection_columns', array( 'Connections_ConnectionCustomPostType', 'all_connections_columns_key' ) );
 add_action( 'manage_connection_posts_custom_column', array( 'Connections_ConnectionCustomPostType', 'all_connections_columns_value' ), 10, 2 );
 
 
+/**
+ * The main class that controls the Connections custom post type.
+ * 
+ * @package    connections-hub
+ * @author     Crystal Barton <atrus1701@gmail.com>
+ */
+if( !class_exists('Connections_ConnectionCustomPostType') ):
 class Connections_ConnectionCustomPostType
 {
-
+	/**
+	 * The stored settings.
+	 * @var  Array
+	 */
 	protected static $_settings = null;
 
+
 	/**
-	 * Constructor.
-	 * Private.  Class only has static members.
-	 * TODO: look up PHP abstract class implementation.
+	 * Private Constructor.  Class only has static members.
 	 */
 	private function __construct() { }
 
 
-	public static function change_slugs() {}
-
+	/**
+	 * Get the custom post type and custom taxonomy settings.
+	 * @param  bool  $refresh  True to refresh the settings even if previously stored.
+	 * @return  Array  The settings for the Labs custom post type.
+	 */
 	public static function get_settings( $refresh = false )
 	{
 		if( self::$_settings !== null && !$refresh ) return self::$_settings;
@@ -65,8 +72,6 @@ class Connections_ConnectionCustomPostType
 		);
 
 		$settings = get_option( CONNECTIONS_HUB_OPTIONS, false );
-//		apl_print($settings, 'db setting');
-//		delete_option( CONNECTIONS_HUB_OPTIONS );
 
 		if( $settings === false )
 		{
@@ -78,6 +83,7 @@ class Connections_ConnectionCustomPostType
 		}
 		else
 		{
+			// Make sure each setting is set.
 			foreach( $default['name'] as $section_name => &$section )
 			{
 				if( !isset($settings['name'][$section_name]) )
@@ -86,6 +92,7 @@ class Connections_ConnectionCustomPostType
 					continue;
 				}
 				
+				// If any short version of a setting is missing, then use full version.
 				foreach( $section as $sk => $sv )
 				{
 					switch( $sk )
@@ -116,12 +123,12 @@ class Connections_ConnectionCustomPostType
 				}
 			}
 		}
-				
+		
+		// Save settings and return.
 		self::$_settings = $settings;
-//		apl_print(self::$_settings, 'complete settings');
-
 		return self::$_settings;
 	}
+
 
 	/**
 	 * Creates the custom Connection post type.
@@ -129,8 +136,9 @@ class Connections_ConnectionCustomPostType
 	public static function create_custom_post()
 	{
 		$settings = self::get_settings();
-//  	apl_print($settings);
 		
+
+		// Setup Connections post type.
 		extract( $settings['name']['connection'] );
 		
 		$labels = array(
@@ -162,9 +170,10 @@ class Connections_ConnectionCustomPostType
 		
 		register_post_type( 'connection', $args );
 
+		
+		// Setup Connections Group taxonomy.
 		extract( $settings['name']['group'] );
-
-		// Add new taxonomy, make it hierarchical (like categories)
+		
 		$labels = array(
 			'name'              => $full_plural,
 			'singular_name'     => $full_single,
@@ -190,9 +199,10 @@ class Connections_ConnectionCustomPostType
 
 		register_taxonomy( 'connection-group', 'connection', $args );
 
-		extract( $settings['name']['link'] );
 
-		// Add new taxonomy, NOT hierarchical (like tags)
+		// Setup Connections Link taxonomy.
+		extract( $settings['name']['link'] );
+		
 		$labels = array(
 			'name'                       => $full_plural,
 			'singular_name'              => $full_single,
@@ -224,12 +234,15 @@ class Connections_ConnectionCustomPostType
 
 		register_taxonomy( 'connection-link', 'connection', $args );
 
+
 		flush_rewrite_rules();
 	}
 	
 	
 	/**
-	 * Updates the messages displayed by the custom Event post type.
+	 * Updates the messages displayed by the custom post type.
+	 * @param  Array  $messages  The messages list.
+	 * @return  Array  The altered messages list.
 	 */
 	public static function update_messages( $messages )
 	{
@@ -252,7 +265,7 @@ class Connections_ConnectionCustomPostType
 	
 	
 	/**
-	 * Sets up the custom meta box with special Event meta data tags.
+	 * Setup the custom meta boxes.
 	 */
 	public static function add_meta_boxes()
 	{
@@ -292,8 +305,8 @@ class Connections_ConnectionCustomPostType
 	
 	
 	/**
-	 * Writes the HTML code used to create the contents of the Event meta box.
-	 * @param WP_Post The current post being displayed.
+	 * Writes the HTML code used to create the contents of the Connections Info meta box.
+	 * @param  WP_Post  $post  The current post being displayed.
 	 */
 	public static function info_box_connections_info( $post )
 	{
@@ -334,7 +347,8 @@ class Connections_ConnectionCustomPostType
 	
 	
 	/**
-	 * 
+	 * Writes the HTML code used to create the contents of the Imported Content meta box.
+	 * @param  WP_Post  $post  The current post being displayed.
 	 */
 	public static function info_box_imported_content( $post )
 	{
@@ -356,6 +370,10 @@ class Connections_ConnectionCustomPostType
 	}
 	
 	
+	/**
+	 * Writes the HTML code used to create the contents of the Contact Info meta box.
+	 * @param  WP_Post  $post  The current post being displayed.
+	 */
 	public static function info_box_contact_info( $post )
 	{
 		$entry_method = self::get_entry_method( $post->ID );
@@ -382,8 +400,8 @@ class Connections_ConnectionCustomPostType
 	
 	
 	/**
-	 * Writes the HTML code used to create the contents of the Event meta box.
-	 * @param WP_Post The current post being displayed.
+	 * Writes the HTML code used to create the contents of the Synch Data meta box.
+	 * @param  WP_Post  $post  The current post being displayed.
 	 */
 	public static function info_box_synch_data( $post )
 	{
@@ -424,8 +442,10 @@ class Connections_ConnectionCustomPostType
 	
 	
 	/**
-	 * Saves the Event's custom meta data.
-	 * @param int The current post's id.
+	 * Save the data from the custom meta boxes.
+	 * @param  int  $post_id  The post id.
+	 * @param  WP_Post  $post  The current post being edited.
+	 * @param  bool  $updated  True if updated, otherwise False.
 	 */
 	public static function save_post_entry_form( $post_id, $post, $updated )
 	{
@@ -446,9 +466,8 @@ class Connections_ConnectionCustomPostType
 
 		$entry_method = self::get_entry_method( $post_id );
 
-		//
+		
 		// Save data
-		//
 		switch( $entry_method )
 		{
 			case( 'synch' ):
@@ -480,9 +499,7 @@ class Connections_ConnectionCustomPostType
 		}
 		
 		
-		//
 		// Synch content
-		//
 		if( !isset($post_data['synch']) ) return;
 		
 		require_once( CONNECTIONS_HUB_PLUGIN_PATH.'/classes/model/synch-model.php' );
@@ -494,13 +511,17 @@ class Connections_ConnectionCustomPostType
 
 
 	/**
-	 * 
+	 * Save meta data.
+	 * @param  int  $post_id  The connections post id.
+	 * @param  string  $sort_title  The sort title.
+	 * @param  string  $username  The username for connections post.
+	 * @param  string  $url  The url for the user's profile site.
+	 * @param  string  $site_type  The type of the site.
+	 * @param  string  $entry_method  The entry method for the connections post.
 	 */
 	public static function save_meta_data( $post_id, $sort_title, $username, $url = null, $site_type = null, $entry_method = null )
 	{
-		//
 		// Get current data
-		//
 		$meta_sort_title = get_post_meta( $post_id, 'sort-title', true );
 		$meta_username = get_post_meta( $post_id, 'username', true );
 		$meta_auto_synch = get_post_meta( $post_id, 'auto-synch', true );
@@ -508,6 +529,7 @@ class Connections_ConnectionCustomPostType
 		$meta_site_type = get_post_meta( $post_id, 'site-type', true );
 		$meta_entry_method = self::get_entry_method( $post_id );
 		
+
 		// Save data
 		update_post_meta( $post_id, 'sort-title', $sort_title );
 		update_post_meta( $post_id, 'username', $username );
@@ -519,35 +541,19 @@ class Connections_ConnectionCustomPostType
 		if( $entry_method !== null )
 			update_post_meta( $post_id, 'entry-method', $entry_method );
 		
-		// set author
+
+		// Set author
 		if( $user = get_user_by('login', $username) )
 		{
 			wp_update_post( array('ID' => $post_id, 'post_author' => $user->ID) );
 		}
 	}
 	
-	
-	public static function alter_connection_query( $wp_query )
-	{
-		if( !is_admin() ) return;
-		if( !$wp_query->is_main_query() ) return;
-
-		$screen = get_current_screen();
-		if( $screen->base != 'edit' ) return;
-
-		if( $wp_query->post_type !== 'connection' ) return;
-		
-		$wp_query->set( 'posts_per_page', get_user_option('edit_connection_per_page') );
-
-// 		if( ($wp_query->get('orderby')) && ($wp_query->get('orderby') != 'datetime') ) return;
-// 		
-// 		$wp_query->set( 'meta_key', 'datetime' );
-// 		$wp_query->set( 'orderby', 'meta_value' );
-	}
-	
 		
 	/**
-	 * 
+	 * Add the link to the 'Synch Connections' in the views portion of the Connections table list.
+	 * @param  Array  $views  The list of views links.
+	 * @return  Array  The altered list of views links.
 	 */
 	public static function all_connections_add_synch_button( $views )
 	{
@@ -559,21 +565,13 @@ class Connections_ConnectionCustomPostType
 
 
 	/**
-	 * 
+	 * Add columns to the Connections table list.
+	 * @param  Array  $columns  The list of columns in the Connections table list.
+	 * @return  Array  The alterd list of columns.
 	 */
 	public static function all_connections_columns_key( $columns )
 	{
-// 		unset($columns['taxonomy-connection-link']);
-
 		$columns['url'] = 'Source';
-		//$columns['synch'] = 'Synch Data';
-
-		/*
-		-connections links
-		-contact info
-		*/
-		
-// 		$columns['taxonomy-connection-link'] = 'Connection Links';
 		$columns['contact-info'] = 'Contact Info';
 		
 		return $columns;
@@ -581,7 +579,9 @@ class Connections_ConnectionCustomPostType
 	
 
 	/**
-	 * 
+	 * Print the content of a cell in the Connections table list.
+	 * @param  string  $column_name  The name of the column.
+	 * @param  int  $post_id  The post id.
 	 */
 	public static function all_connections_columns_value( $column_name, $post_id )
 	{
@@ -594,7 +594,6 @@ class Connections_ConnectionCustomPostType
 						echo '<div class="synch-entry">';
 						
 						$url = get_post_meta( $post_id, 'url', true );
-// 						$url = connections_fix_url( $url );
 						if( $url === '' ) echo 'Invalid URL<br/>';
 						else echo '<a href="'.$url.'" target="_blank">'.$url.'</a><br/>';
 						
@@ -627,7 +626,11 @@ class Connections_ConnectionCustomPostType
 	}
 	
 	
-	
+	/**
+	 * Format the synch data for display.
+	 * @param  Array  $data  The synch data.
+	 * @return  string  The formatted synch data.
+	 */
 	public static function format_synch_data( $data )
 	{
 		$sd = '';
@@ -656,6 +659,11 @@ class Connections_ConnectionCustomPostType
 	}
 	
 	
+	/**
+	 * Get the entry method of the Connections post.
+	 * @param  int  $post_id  The post id.
+	 * @return  string  The entry method for the Connections post.
+	 */
 	public static function get_entry_method( $post_id )
 	{
 		$entry_method = get_post_meta( $post_id, 'entry-method', true );
@@ -664,35 +672,21 @@ class Connections_ConnectionCustomPostType
 	}
 
 
+	/**
+	 * Generate search content without special and extra characters.
+	 * @param  string  $content  The post content.
+	 * @return  string  The generated search content.
+	 */
 	public static function generate_search_data( $content )
 	{
-// 		$tags = array('<p>','</p>','<br />','<br/>','<br>','</li>','</ol>','</ul>','<hr />','<hr/>','<hr>','</h1>','</h2>','</h3>','</h4>','</h5>','</h6>');
-// 		$search_content = str_replace( $tags, "\n", $content);
 		$search_content = strip_tags($content);
 		$search_content = html_entity_decode($search_content, ENT_COMPAT, 'UTF-8');
-// 		$search_content = preg_replace( "/[^A-Za-z0-9\n ]/", ' ', $search_content );
 		$search_content = preg_replace( '/  /', ' ', $search_content );
 		$search_content = preg_replace( '/\n\n+/', "\n", $search_content );
 		$search_content = preg_replace( '/(\r\n)(\r\n)+/', "\n", $search_content );
-// 		$search_content = explode( '\n', $search_content );
-// 		for( $i = 0; $i < count($search_content); $i++ )
-// 		{
-// 			$search_content[$i] = trim($search_content[$i]);
-// 			if( empty($search_content[$i]) )
-// 			{
-// 				$search_content[$i] = 'need to remove';
-// 				//array_splice( $search_content, $i, 1 );
-// 				//$i--;
-// 			}
-// 		}
-// 		$search_content = implode( '\n', $search_content );
-// 		$search_content = htmlentities2utf8( $content );
 
 		return $search_content;
 	}
-
-
-
 }
-
+endif;
 

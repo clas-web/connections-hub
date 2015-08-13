@@ -1,31 +1,37 @@
 <?php
-
 /**
- * ConnectionsHub_Model
- * 
  * The main model for the Connections Hub plugin.
  * 
  * @package    connections-hub
  * @subpackage classes/model
- * @author     Crystal Barton <cbarto11@uncc.edu>
+ * @author     Crystal Barton <atrus1701@gmail.com>
  */
 if( !class_exists('ConnectionsHub_Model') ):
 class ConnectionsHub_Model
 {
-	
-	private static $instance = null;	// The only instance of this class.
-	public $synch = null;				// The synch model.
-	public $last_error = null;			// The error logged by a model.	
+	/**
+	 * The only instance of the current model.
+	 * @var  ConnectionsHub_Model
+	 */
+	private static $instance = null;
+
+	/**
+	 * The Synch Model.
+	 * @var  ConnectionsHub_SynchModel
+	 */
+	public $synch = null;
+
+	/**
+	 * The last error saved by the model.
+	 * @var  string
+	 */
+	public $last_error = null;
 	
 	
 	/**
 	 * Private Constructor.  Needed for a Singleton class.
-	 * Creates an ConnectionsHub_Model object.
 	 */
-	protected function __construct()
-	{
-		
-	}
+	protected function __construct() { }
 
 
 	/**
@@ -52,7 +58,6 @@ class ConnectionsHub_Model
 	}
 
 
-
 //========================================================================================
 //========================================================================= Log file =====
 
@@ -68,9 +73,8 @@ class ConnectionsHub_Model
 
 	/**
 	 * Write a line to a log file.
-	 * @param  string  $text      The line of text to insert into the log.
-	 * @param  bool    $newline   True if a new line character should be inserted after
-	 *                            the line, otherwise False.
+	 * @param  string  $text  The line of text to insert into the log.
+	 * @param  bool  $newline  True if a new line character should be inserted after the line, otherwise False.
 	 */
 	public function write_to_log( $text = '', $newline = true )
 	{
@@ -80,16 +84,15 @@ class ConnectionsHub_Model
 	}
 	
 	
-	
 //========================================================================================
 //=============================================== Import / Updating Connection posts =====
 	
 	
 	/**
 	 * Adds or updates a Connection post for a user.
-	 * @param   string  $username  The username of the user.
-	 * @param   array   $urows     The rows of the uploaded file that are associated with the user.
-	 * @return  bool    True if the user was added/updated successfully, otherwise false.
+	 * @param  string  $username  The username of the user.
+	 * @param  array  $urows  The rows of the uploaded file that are associated with the user.
+	 * @return  bool  True if the user was added/updated successfully, otherwise false.
 	 */
 	public function add_connection( $username, &$urows )
 	{
@@ -97,7 +100,8 @@ class ConnectionsHub_Model
 		
 		$urow['slug'] = ( isset($urow['slug']) ? $urow['slug'] : sanitize_title($urow['title']) );
 		
-		// set defaults for the Connection post.
+
+		// Set defaults for the Connection post.
 		$connections_post = array(
 			'post_title'   => $urow['title'],
 			'post_name'    => $urow['slug'],
@@ -107,13 +111,15 @@ class ConnectionsHub_Model
 		
 		if( isset($urow['content']) ) $connections_post['post_content'] = $urow['content'];
 		
-		// get author information by username, if it exists.
+		
+		// Get author information by username, if it exists.
 		if( $user = get_user_by( 'login', $username ) )
 		{
 			$connections_post['post_author'] = $user->ID;
 		}
 
-		// set the Connection groups and links.
+
+		// Set the Connection groups and links.
 		$taxonomy_terms = array();
 		foreach( $urows as $ur )
 		{
@@ -134,7 +140,8 @@ class ConnectionsHub_Model
 		
 		if( !empty($taxonomy_terms) ) $connections_post['tax_input'] = $taxonomy_terms;
 		
-		// determine if post for user already exists, then insert or update the post.
+		
+		// Determine if post for user already exists, then insert or update the post.
 		$wpquery = new WP_Query(
 			array(
 				'post_type'  => 'connection',
@@ -144,12 +151,10 @@ class ConnectionsHub_Model
 			)
 		);
 		
-//		apl_print($connections_post, 'connections_post');
 		
-		// update if post exists, otherwise insert.
+		// Update if post exists, otherwise insert.
 		if( $wpquery->have_posts() )
 		{
-//			apl_print('updating post');
 			$wpquery->the_post();
 			$post = get_post();
 			$connections_post['ID'] = $post->ID;
@@ -165,7 +170,6 @@ class ConnectionsHub_Model
 		}
 		else
 		{
-//			apl_print('creating post');
 			$result = wp_insert_post( $connections_post, true );
 			
 			if( is_wp_error($result) )
@@ -184,10 +188,12 @@ class ConnectionsHub_Model
 			update_post_meta( $post_id, 'search-content', $search_content );
 		}
 		
-		// save the Connections meta data ( sort-title, url, username, site-type ).
+		
+		// Save the Connections meta data ( sort-title, url, username, site-type ).
 		Connections_ConnectionCustomPostType::save_meta_data( $post_id, $urow['sort-title'], $username, $urow['url'], $urow['site-type'], $urow['entry-method'] );
 		
-		// save the contact info.
+		
+		// Save the contact info.
 		if( isset($urow['contact-info']) ) update_post_meta( $post_id, 'contact-info', $urow['contact-info'] );
 		update_post_meta( $post_id, 'contact-info-filter', 'yes' );
 		
@@ -217,7 +223,6 @@ class ConnectionsHub_Model
 	}
 	
 
-
 //========================================================================================
 //=================================================================== Util Functions =====
 	
@@ -225,12 +230,10 @@ class ConnectionsHub_Model
 	/**
 	 * Gets a list of taxonomies with matching terms or ids (for heirarchical taxonomies).
 	 * Creates any terms that do not currently exist.
-	 * @param   array       $taxonomies     An array of taxonomies with terms in 
-	 *                                      comma-seperated string form.
-	 * @param   bool        $supports_null  True if null should be returned on failure or 
-	 *                                      taxonomy list is empty.
-	 * @return  array|null  An array of taxonomies with their terms or ids on success, 
-	 *                      otherwise null or empty array (based on supports_null).
+	 * @param  array  $taxonomies  An array of taxonomies with terms in comma-seperated string form.
+	 * @param  bool  $supports_null  True if null should be returned on failure or taxonomy list is empty.
+	 * @return  array|null  An array of taxonomies with their terms or ids on success, otherwise 
+	 *                      null or empty array (based on supports_null).
 	 */
 	protected function get_taxonomies( $taxonomies, $supports_null = false )
 	{
@@ -299,6 +302,10 @@ class ConnectionsHub_Model
 	}
 	
 	
+	/**
+	 * Get all the Connections.
+	 * @return  Array  The list of Connections.
+	 */
 	public function get_all_connections()
 	{
 		$connections = get_posts(
@@ -341,7 +348,6 @@ class ConnectionsHub_Model
 				$conns[$i]['connection-link'] = implode( ',', $connection_links );
 				
 				$conns[$i]['content'] = $cp->post_content;
-// 				$conns[$i]['search-content'] = get_post_meta( $cp->ID, 'search-content', true );
 				
 				$i++;
 			}
@@ -353,10 +359,10 @@ class ConnectionsHub_Model
 
 	/**
 	 * Exports a list of Connections to a CSV.
-	 * @param   array   $filter       An array of filter name and values.
-	 * @param   array   $search       An array of search columns and phrases.
-	 * @param   bool    $only_errors  True if filter out OrgHub users with errors.
-	 * @param   string  $orderby      The column to orderby.
+	 * @param  array  $filter  An array of filter name and values.
+	 * @param  array  $search  An array of search columns and phrases.
+	 * @param  bool  $only_errors  True if filter out OrgHub users with errors.
+	 * @param  string  $orderby  The column to orderby.
 	 */
 	public function csv_export()
 	{
@@ -379,7 +385,6 @@ class ConnectionsHub_Model
 			'connection-link',
 			
 			'content',
-// 			'search-content',
 		);
 		
 		PHPUtil_CsvHandler::export( 'connections', $headers, $connections );

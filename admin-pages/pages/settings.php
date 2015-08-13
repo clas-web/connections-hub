@@ -1,23 +1,23 @@
 <?php
 /**
- * ConnectionsHub_SettingsAdminPage
- * 
- * This class controls the admin page "Settings".
+ * Controls the admin page "Settings".
  * 
  * @package    connection-hub
  * @subpackage admin-pages/pages
- * @author     Crystal Barton <cbarto11@uncc.edu>
+ * @author     Crystal Barton <atrus1701@gmail.com>
  */
-
 if( !class_exists('ConnectionsHub_SettingsAdminPage') ):
 class ConnectionsHub_SettingsAdminPage extends APL_AdminPage
 {
-	
-	private $model = null;	
+	/**
+	 * The main model for the Connections Hub plugin.
+	 * @var  ConnectionsHub_Model
+	 */
+	private $model = null;
 	
 	
 	/**
-	 * Creates an ConnectionsHub_SettingsAdminPage object.
+	 * Controller.
 	 */
 	public function __construct(
 		$name = 'settings',
@@ -96,21 +96,40 @@ class ConnectionsHub_SettingsAdminPage extends APL_AdminPage
 	}
 	
 	
+	/**
+	 * Print the any instructions for the Connections custom post type section.
+	 * @param  Array  $args  The passed args.
+	 */
 	public function print_section_connections_custom_post_type( $args )
 	{
 		apl_print('print_section_connections_custom_post_type');
 	}
 
+
+	/**
+	 * Print the any instructions for the Connections group taxonomy section.
+	 * @param  Array  $args  The passed args.
+	 */
 	public function print_section_connections_group_taxonomy( $args )
 	{
 		apl_print('print_section_connections_group_taxonomy');
 	}
 
+
+	/**
+	 * Print the any instructions for the Connections link taxonomy section.
+	 * @param  Array  $args  The passed args.
+	 */
 	public function print_section_connections_link_taxonomy( $args )
 	{
 		apl_print('print_section_connections_link_taxonomy');
 	}
 
+
+	/**
+	 * Print override textbox for post type or taxonomy field.
+	 * @param  Array  $args  The passed args.
+	 */
 	public function print_field_override_name( $args )
 	{
 		$name = array_merge( 
@@ -125,10 +144,17 @@ class ConnectionsHub_SettingsAdminPage extends APL_AdminPage
 	}
 	
 	
+	/**
+	 * Get a Connections setting.
+	 * @param  Array  $args  The passed args.
+	 * @return  string|null  The setting, or Null if not found.
+	 */
 	protected function get_connection_setting( $args )
 	{
 		$settings = Connections_ConnectionCustomPostType::get_settings();
 		
+		$value = null;
+
 		for( $i = 1; $i < count($args); $i++ )
 		{
 			if( !array_key_exists($args[$i], $settings) ) break;
@@ -150,9 +176,9 @@ class ConnectionsHub_SettingsAdminPage extends APL_AdminPage
 	
 	/**
 	 * Processes the current admin page's Settings API input.
-	 * @param   array   $settings  The inputted settings from the Settings API.
-	 * @param   string  $option    The option key of the settings input array.
-	 * @return  array   The resulted array to store in the db.
+	 * @param  array  $settings  The inputted settings from the Settings API.
+	 * @param  string  $option  The option key of the settings input array.
+	 * @return  array  The resulted array to store in the db.
 	 */
 	public function process_settings( $settings, $option )
 	{
@@ -192,8 +218,7 @@ class ConnectionsHub_SettingsAdminPage extends APL_AdminPage
 	{
 		$this->print_settings();
 	}
-	
-	
+
 } // class ConnectionsHub_SettingsAdminPage extends APL_AdminPage
 endif; // if( !class_exists('ConnectionsHub_SettingsAdminPage') )
 

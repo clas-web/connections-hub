@@ -1,30 +1,41 @@
 <?php
-
 /**
- * ConnectionsHub_SynchModel
- * 
  * The synch model for the Connections Hub plugin.
  * 
  * @package    connections-hub
  * @subpackage classes/model
- * @author     Crystal Barton <cbarto11@uncc.edu>
+ * @author     Crystal Barton <atrus1701@gmail.com>
  */
-
 if( !class_exists('ConnectionsHub_SynchModel') ):
 class ConnectionsHub_SynchModel
 {
-	
-	private static $instance = null;	// The only instance of this class.
+	/**
+	 * The only instance of the current model.
+	 * @var  ConnectionsHub_SynchModel
+	 */
+	private static $instance = null;
 
-	public $model = null;				// The main model.
+	/**
+	 * The main model for the Connections Hub.
+	 * @var  ConnectionsHub_Model
+	 */
+	public $model = null;
 	
-	public $last_error = null;			// The error logged by a model.
-	protected $write_log = true;		// 
+	/**
+	 * The last error saved by the model.
+	 * @var  string
+	 */
+	public $last_error = null;
+
+	/**
+	 * True if synching connections should write to the log, otherwise False.
+	 * @var  bool
+	 */
+	protected $write_log = true;
 	
 	
 	/**
 	 * Private Constructor.  Needed for a Singleton class.
-	 * Creates an ConnectionsHub_SynchModel object.
 	 */
 	protected function __construct()
 	{
@@ -48,9 +59,8 @@ class ConnectionsHub_SynchModel
 	
 	/**
 	 * Write a line to a log file.
-	 * @param  string  $text      The line of text to insert into the log.
-	 * @param  bool    $newline   True if a new line character should be inserted after
-	 *                            the line, otherwise False.
+	 * @param  string  $text  The line of text to insert into the log.
+	 * @param  bool  $newline  True if a new line character should be inserted after the line, otherwise False.
 	 */
 	public function write_to_log( $text = '', $newline = true )
 	{
@@ -132,7 +142,6 @@ class ConnectionsHub_SynchModel
 			
 			$connections[] = array(
 				'name'       => $post->post_title,
-// 				'url'        => connections_fix_url( get_post_meta( $post->ID, 'url', true ) ),
 				'url'        => get_post_meta( $post->ID, 'url', true ),
 				'site-type'  => get_post_meta( $post->ID, 'site-type', true ),
 				'synch-data' => get_post_meta( $post->ID, 'synch-data', true ),
@@ -148,8 +157,8 @@ class ConnectionsHub_SynchModel
 
 	/**
 	 * Get the complete data for a Connectios post.
-	 * @param   int         $connections_post_id  The id of the Connections post.
-	 * @retrun  array|bool  The connections post's data on success, otherwise false.
+	 * @param  int  $connections_post_id  The id of the Connections post.
+	 * @return  array|bool  The connections post's data on success, otherwise false.
 	 */
 	public function get_data( $connection_post_id )
 	{
@@ -169,8 +178,6 @@ class ConnectionsHub_SynchModel
 			return false;
 		}
 		
-		//TODO....
-		//$url = connections_fix_url( $url );
 		$site_type = get_post_meta( $connection_post_id, 'site-type', true );
 
 		$actions = array();
@@ -223,12 +230,12 @@ class ConnectionsHub_SynchModel
 	
 	/**
 	 * Update the Connections post with the new data.
-	 * @param   int    $connection_post_id  The Connections post id.
-	 * @param   array  $data                The new data.
+	 * @param  int  $connection_post_id  The Connections post id.
+	 * @param  array  $data  The new data.
 	 */
 	public function synch( $connection_post_id, &$data )
 	{
-		// generate search data based on content.
+		// Generate search data based on content.
 		$search_content = '';
 		$content = '';
 		if( isset($data['content']) )
@@ -238,7 +245,7 @@ class ConnectionsHub_SynchModel
 			unset($data['content']);
 		}
 		
-		// merge data with default data.
+		// Merge data with default data.
 		$default_data = array(
 			'blog-id' => ( !empty($data['blog-id']) ? $data['blog-id'] : 'n/a' ),
 			'post-id' => ( !empty($data['post-id']) ? $data['post-id'] : 'not specified' ),
@@ -250,7 +257,7 @@ class ConnectionsHub_SynchModel
 		);
 		$data = array_merge( $default_data, $data );
 		
-		// seperate out the contact information.
+		// Seperate out the contact information.
 		$contact_info = null;
 		if( isset($data['contact-info']) )
 		{
@@ -265,7 +272,7 @@ class ConnectionsHub_SynchModel
 			unset($data['contact-info-filter']);
 		}
 		
-		// update the Connection post.
+		// Update the Connection post.
 		wp_update_post( array( 'ID' => $connection_post_id, 'post_content' => $content ) );
 		update_post_meta( $connection_post_id, 'search-content', $search_content );
 		update_post_meta( $connection_post_id, 'synch-data', $data );
@@ -274,18 +281,18 @@ class ConnectionsHub_SynchModel
 
 	/**
 	 * Contact a WordPress site's Connection Spoke plugin and get synch data.
-	 * @param   int     $id   The Connections post's id.
-	 * @param   string  $url  The url of the Wordpress site.
+	 * @param  int  $id  The Connections post's id.
+	 * @param  string  $url  The url of the Wordpress site.
 	 * @return  string  The output of the plugin.
 	 */
 	public function get_wp_plugin_data( $id, $url )
 	{
-		// determine the Connections Spoke's url.
+		// Determine the Connections Spoke's url.
 		if( substr($url,-1) !== '/' ) $url .= '/';
 		$hub = get_bloginfo( 'name' ).'|'.get_edit_post_link( $id );
 		$plugin_page_url = $url.'?connections-spoke-api=get-connections-data&connections-hub='.urlencode($hub);
 		
-		// contact site for Connections Spoke data.
+		// Contact site for Connections Spoke data.
 		$context = stream_context_create(
 			array(
 				'http' => array(
@@ -296,15 +303,15 @@ class ConnectionsHub_SynchModel
 			)
 		);
 		
-		// get data.
+		// Get data.
 		$page_contents = @file_get_contents( $plugin_page_url, false, $context );
 		if( empty($page_contents) ) return false;
 		
-		// parse data.
+		// Parse data.
 		$site_data = json_decode( $page_contents, true );
 		if( $site_data === false ) return false;
 		
-		// check for unsuccessful status.
+		// Check for unsuccessful status.
 		if( (!isset($site_data['status'])) || ($site_data['status'] !== true) )
 			return false;
 		
@@ -314,8 +321,8 @@ class ConnectionsHub_SynchModel
 	
 	/**
 	 * Gets the contents of the page/post of a local WordPress site.
-	 * @param   int     $id   The Connections post's id.
-	 * @param   string  $url  The url of the Wordpress site.
+	 * @param  int  $id  The Connections post's id.
+	 * @param  string  $url  The url of the Wordpress site.
 	 * @return  string  The content of the page/post of the site.
 	 */
 	public function get_wp_local_post_data( $id, $url )
@@ -323,13 +330,13 @@ class ConnectionsHub_SynchModel
 		global $wpdb;
 		$blog_id = -1;
 		
-		// parse the host and path from the url.
+		// Parse the host and path from the url.
 		$host = parse_url($url, PHP_URL_HOST);
 		$path = parse_url($url, PHP_URL_PATH);
 		$path_parts = array_filter( explode('/', $path), 'strlen' );
 		$path = implode( '/', $path_parts );
 		
-		// search blogs table for site.
+		// Search blogs table for site.
 		$sql = "SELECT blog_id FROM $wpdb->blogs WHERE domain = %s AND path = %s";
 
 		if( strlen($path) == 0 )
@@ -354,7 +361,7 @@ class ConnectionsHub_SynchModel
 			}
 		}
 		
-		// blog not found.
+		// Blog not found.
 		if( $blog_id == -1 ) return false;
 		
 		switch_to_blog( $blog_id );
@@ -459,8 +466,8 @@ class ConnectionsHub_SynchModel
 	
 	/**
 	 * Gets the contents of the main post of an RSS feed.
-	 * @param   int     $id   The Connections post's id.
-	 * @param   string  $url  The url of the RSS feed.
+	 * @param  int  $id  The Connections post's id.
+	 * @param  string  $url  The url of the RSS feed.
 	 * @return  string  The content of the main RSS post.
 	 */
 	public function get_rss_feed_data( $id, $url )
@@ -496,8 +503,7 @@ class ConnectionsHub_SynchModel
 
 		return $synch_data;
 	}
-	
-	
+
 } // class ConnectionsHub_SynchModel
 endif; // if( !class_exists('ConnectionsHub_SynchModel') ):
 

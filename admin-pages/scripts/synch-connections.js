@@ -1,6 +1,5 @@
 
 
-
 jQuery(document).ready(
 	function()
 	{
@@ -15,7 +14,6 @@ jQuery(document).ready(
 			});
 	}
 );
-
 
 
 //========================================================================================
@@ -136,7 +134,6 @@ function check_connection_loop_end( fi, settings, ai, ajax, success, data )
 }
 
 
-
 //========================================================================================
 //================================================================ Synch Connections =====
 
@@ -246,7 +243,6 @@ function synch_connection_loop_end( fi, settings, ai, ajax, success, data )
 }
 
 
-
 //========================================================================================
 //=================================================================== Util functions =====
 
@@ -304,9 +300,4 @@ function add_post_results( post_id, post_title, success, data )
 	
 	jQuery('#connections-synch-results').prepend( jQuery(div).html() );	
 }
-
-
-
-
-
 

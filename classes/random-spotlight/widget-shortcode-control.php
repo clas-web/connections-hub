@@ -1,33 +1,43 @@
 <?php
-
 /**
- * WidgetShortcodeControl
- * 
- * The WidgetShortcodeControl class for widget and shortcode plugins.
+ * Base class for all widget and shortcode controls.
  * 
  * @package    WidgetShortcodeControl
- * @author     Crystal Barton <cbarto11@uncc.edu>
+ * @author     Crystal Barton <atrus1701@gmail.com>
  */
 if( !class_exists('WidgetShortcodeControl') ):
 class WidgetShortcodeControl extends WP_Widget
 {
-	
+	/**
+	 * The index for the current widget / shortcode object.
+	 * @var  int
+	 */
 	protected static $index = 0;
 	
+	/**
+	 * The control type (widget or shortcode).
+	 * @var  string
+	 */
 	public $control_type;
+
+	/**
+	 * The arguments for the widget or shortcode.
+	 * @var  Array
+	 */
 	private $args;
 	
 	
 	/**
 	 * Constructor.
 	 * Setup the shortcode or widget default properties and actions.
-	 * @param string $id_base         Optional Base ID for the widget, lowercase and unique. If left empty,
-	 *                                a portion of the widget's class name will be used Has to be unique.
-	 * @param string $name            Name for the widget displayed on the configuration page.
-	 * @param array  $widget_options  Optional. Widget options. See {@see wp_register_sidebar_widget()} for
-	 *                                information on accepted arguments. Default empty array.
-	 * @param array  $control_options Optional. Widget control options. See {@see wp_register_widget_control()}
-	 *                                for information on accepted arguments. Default empty array.
+	 * @param  string  $id_base  Optional Base ID for the widget, lowercase and unique. If left empty,
+	 *                           a portion of the widget's class name will be used Has to be unique.
+	 * @param  string  $name  Name for the widget displayed on the configuration page.
+	 * @param  array  $widget_options  Optional. Widget options. See {@see wp_register_sidebar_widget()} for
+	 *                                 information on accepted arguments. Default empty array.
+	 * @param  array  $control_options  Optional. Widget control options. See {@see 
+	 *                                  wp_register_widget_control()} for information on accepted 
+	 *                                  arguments. Default empty array.
      */
 	public function __construct( $id_base, $name, $widget_ops = null, $control_ops = null )
 	{
@@ -84,8 +94,8 @@ class WidgetShortcodeControl extends WP_Widget
 	/**
 	 * Echo the widget content.
 	 * Override function from WP_Widget parent class.
-	 * @param   array  $args     Display arguments for the widget.
-	 * @param   array  $options  The settings for this instance of the widget.
+	 * @param  array  $args  Display arguments for the widget.
+	 * @param  array  $options  The settings for this instance of the widget.
 	 */
 	public function widget( $args, $options )
 	{
@@ -98,7 +108,7 @@ class WidgetShortcodeControl extends WP_Widget
 	/**
 	 * Echo the shortcode content.
 	 * Called by Shortcode API.
-	 * @param   array  $options  The settings for this shortcode.
+	 * @param  array  $options  The settings for this shortcode.
 	 */
 	public function shortcode( $options )
 	{
@@ -117,7 +127,7 @@ class WidgetShortcodeControl extends WP_Widget
 	 * Replacing with print_widget_form.
 	 * Do not override. Override print_widget_form instead.
 	 * Override function from WP_Widget parent class.
-	 * @param   array   $options  The current settings for the widget.
+	 * @param  array  $options  The current settings for the widget.
 	 */
 	public function form( $options )
 	{
@@ -128,7 +138,7 @@ class WidgetShortcodeControl extends WP_Widget
 	/**
 	 * Output the widget form in the admin.
 	 * Use this function instead of form.
-	 * @param   array   $options  The current settings for the widget.
+	 * @param  array  $options  The current settings for the widget.
 	 */
 	public function print_widget_form( $options )
 	{
@@ -139,8 +149,8 @@ class WidgetShortcodeControl extends WP_Widget
 	/**
 	 * Update a particular instance.
 	 * Override function from WP_Widget parent class.
-	 * @param   array       $new_options  New options set in the widget form by the user.
-	 * @param   array       $old_options  Old options from the database.
+	 * @param  array  $new_options  New options set in the widget form by the user.
+	 * @param  array  $old_options  Old options from the database.
 	 * @return  array|bool  The settings to save, or false to cancel saving.
 	 */
 	public function update( $new_options, $old_options )
@@ -152,8 +162,8 @@ class WidgetShortcodeControl extends WP_Widget
 	/**
 	 * Process options from the database or shortcode.
 	 * Designed to convert options from strings or sanitize output.
-	 * @param   array   $options  The current settings for the widget or shortcode.
-	 * @return  array   The processed settings.
+	 * @param  array  $options  The current settings for the widget or shortcode.
+	 * @return  array  The processed settings.
 	 */
 	public function process_options( $options )
 	{
@@ -194,7 +204,7 @@ class WidgetShortcodeControl extends WP_Widget
 	
 	/**
 	 * Merges the default options with the user-entered options.
-	 * @param   array  $options  The user-entered options.
+	 * @param  array  $options  The user-entered options.
 	 * @return  array  The complete options.
 	 */
 	public function merge_options( $options )
@@ -205,14 +215,13 @@ class WidgetShortcodeControl extends WP_Widget
 	
 	/**
 	 * Echo the widget or shortcode contents.
-	 * @param   array  $options  The current settings for the control.
-	 * @param   array  $args     The display arguments.
+	 * @param  array  $options  The current settings for the control.
+	 * @param  array  $args  The display arguments.
 	 */
 	public function print_control( $options, $args )
 	{
 		die('function WidgetShortcodeControl::print_control() must be over-ridden in a sub-class.');
 	}
-	
 }
 endif;
 

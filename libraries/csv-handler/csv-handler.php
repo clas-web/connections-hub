@@ -5,7 +5,7 @@
  * A general purpose CSV Handler for importing and exporting.
  * 
  * @package    csv-handler
- * @author     Crystal Barton <cbarto11@uncc.edu>
+ * @author     Crystal Barton <atrus1701@gmail.com>
  */
 
 if( !class_exists('PHPUtil_CsvHandler') ):

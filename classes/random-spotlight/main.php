@@ -1,15 +1,15 @@
 <?php
 /*
 Plugin Name: Connections Hub: Random Spotlight
-Plugin URI: 
-Description: Display up to 5 pairs of Connections posts with matching Connection Links.
+Plugin URI: https://github.com/clas-web/connections-hub
+Description: Display up to 20 pairs of Connections posts with matching Connection Links.
 Version: 1.0.0
 Author: Crystal Barton
-Author URI: 
+Author URI: http://www.linkedin.com/in/crystalbarton
 */
 
 
-require_once( dirname(__FILE__).'/control.php' );
+require_once( __DIR__.'/control.php' );
 ConnectionHubRandomSpotlight_WidgetShortcodeControl::register_widget();
 ConnectionHubRandomSpotlight_WidgetShortcodeControl::register_shortcode();
 

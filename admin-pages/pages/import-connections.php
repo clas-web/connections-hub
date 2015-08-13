@@ -1,23 +1,23 @@
 <?php
 /**
- * ConnectionsHub_ImportConnectionsAdminPage
- * 
- * This class controls the admin page "Import Connections".
+ * Controls the admin page "Import Connections".
  * 
  * @package    connection-hub
  * @subpackage admin-pages/pages
- * @author     Crystal Barton <cbarto11@uncc.edu>
+ * @author     Crystal Barton <atrus1701@gmail.com>
  */
-
 if( !class_exists('ConnectionsHub_ImportConnectionsAdminPage') ):
 class ConnectionsHub_ImportConnectionsAdminPage extends APL_AdminPage
 {
-	
+	/**
+	 * The main model for the Connections Hub plugin.
+	 * @var  ConnectionsHub_Model
+	 */
 	private $model = null;	
 	
 	
 	/**
-	 * Creates an ConnectionsHub_ImportConnectionsAdminPage object.
+	 * Controller.
 	 */
 	public function __construct(
 		$name = 'import-connections',
@@ -50,6 +50,9 @@ class ConnectionsHub_ImportConnectionsAdminPage extends APL_AdminPage
 	}
 	
 	
+	/**
+	 * Import the connections from the file.
+	 */
 	protected function import_file()
 	{
 		// check for upload file.
@@ -119,7 +122,6 @@ class ConnectionsHub_ImportConnectionsAdminPage extends APL_AdminPage
 		$this->add_notice( $processed_rows . ' users added or updated successfully.' );
 	}
 	
-
 	
 	/**
 	 * Displays the current admin page.
@@ -138,8 +140,7 @@ class ConnectionsHub_ImportConnectionsAdminPage extends APL_AdminPage
  		<?php
  		$this->form_end();
 	}
-	
-	
+
 } // class ConnectionsHub_ImportConnectionsAdminPage extends APL_AdminPage
 endif; // if( !class_exists('ConnectionsHub_ImportConnectionsAdminPage') )
 
