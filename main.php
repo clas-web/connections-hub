@@ -153,9 +153,9 @@ function conhub_update()
 	$version = get_option( CONNECTIONS_HUB_DB_VERSION_OPTION );
  	if( $version !== CONNECTIONS_HUB_DB_VERSION )
  	{
-		$model = ConnectionsHub_Model::get_instance();
-		$model->create_tables();
- 	}
+		// Put in changes to database here.
+		// $model = ConnectionsHub_Model::get_instance();
+	}
 		
 	update_option( CONNECTIONS_HUB_VERSION_OPTION, CONNECTIONS_HUB_VERSION );
 	update_option( CONNECTIONS_HUB_DB_VERSION_OPTION, CONNECTIONS_HUB_DB_VERSION );
