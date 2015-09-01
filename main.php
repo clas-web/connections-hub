@@ -194,6 +194,7 @@ if( !function_exists('conhub_query_vars') ):
 function conhub_query_vars( $query_vars )
 {
 	$query_vars[] = 'synch-connections';
+	$query_vars[] = 'generate-connections-url';
 	return $query_vars;
 }
 endif;
@@ -206,7 +207,6 @@ endif;
 if( !function_exists('conhub_parse_request') ):
 function conhub_parse_request( &$wp )
 {
-	global $wp;
 	if( array_key_exists('synch-connections', $wp->query_vars) )
 	{
 		echo "\nSynching Connections...";
@@ -216,7 +216,13 @@ function conhub_parse_request( &$wp )
 			echo "done.\n\n";
 		exit();
 	}
-	return;
+	elseif( array_key_exists('generate-connections-url', $wp->query_vars) )
+	{
+		require_once( CONNECTIONS_HUB_PLUGIN_PATH . '/classes/custom-post-type/connection.php' );
+		$id = intval( $wp->query_vars['generate-connections-url'] );
+		echo get_permalink( $id );
+		exit();
+	}
 }
 endif;
 
