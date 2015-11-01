@@ -70,11 +70,11 @@ class ConnectionsHub_ImportConnectionsAdminPage extends APL_AdminPage
 		}
 
 		// check that uploaded file type is supported.
-		if( $_FILES['upload']['type'] !== 'text/csv' )
-		{
-			$this->set_error( 'Error uploading file: "'.$_FILES['upload']['name'].'".  Unsupported filetype: "'.$_FILES['csv-file']['type'].'".' );
-			return;
-		}
+		// if( $_FILES['upload']['type'] !== 'text/csv' )
+		// {
+		// 	$this->set_error( 'Error uploading file: "'.$_FILES['upload']['name'].'".  Unsupported filetype: "'.$_FILES['upload']['type'].'".' );
+		// 	return;
+		// }
 
 		require_once( CONNECTIONS_HUB_PLUGIN_PATH . '/libraries/csv-handler/csv-handler.php' );
 		
