@@ -462,7 +462,7 @@ class Connections_ConnectionCustomPostType
 			return;
 		
 		$post_data = $_POST;
-		unset($_POST); // prevent looping...
+		$_POST['connection-custom-post-type-entry-form'] = NULL; // Prevent looping
 
 		$entry_method = self::get_entry_method( $post_id );
 
