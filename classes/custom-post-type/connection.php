@@ -1,6 +1,5 @@
 <?php
 
-
 add_action( 'init', array( 'Connections_ConnectionCustomPostType', 'create_custom_post' ) );
 add_filter( 'post_updated_messages', array( 'Connections_ConnectionCustomPostType', 'update_messages' ) );
 
@@ -28,14 +27,14 @@ class Connections_ConnectionCustomPostType
 	 * @var  Array
 	 */
 	protected static $_settings = null;
-
-
+	
+	
 	/**
 	 * Private Constructor.  Class only has static members.
 	 */
 	private function __construct() { }
-
-
+	
+	
 	/**
 	 * Get the custom post type and custom taxonomy settings.
 	 * @param  bool  $refresh  True to refresh the settings even if previously stored.
@@ -128,8 +127,8 @@ class Connections_ConnectionCustomPostType
 		self::$_settings = $settings;
 		return self::$_settings;
 	}
-
-
+	
+	
 	/**
 	 * Creates the custom Connection post type.
 	 */	
@@ -455,7 +454,7 @@ class Connections_ConnectionCustomPostType
 		if ( defined('DOING_AUTOSAVE') && DOING_AUTOSAVE ) 
 			return;
 
-		if ( !current_user_can('edit_page', $post_id) )
+		if ( !current_user_can('edit_post', $post_id) )
 			return;
 
 		if( !wp_verify_nonce($_POST['connection-custom-post-type-entry-form'], CONNECTIONS_HUB_PLUGIN_PATH) )
