@@ -282,6 +282,7 @@ class ConnectionHubRandomSpotlight_WidgetShortcodeControl extends WidgetShortcod
 					<?php endforeach; ?>
 				</div><!-- .connection-groups -->
 				
+				<div class="entry-content-container">
 				<div class="entry-content">
 				<div>
 
@@ -305,6 +306,7 @@ class ConnectionHubRandomSpotlight_WidgetShortcodeControl extends WidgetShortcod
 						<h5><?php echo $connection_links_name; ?></h5>
 						
 						<?php $count = 1; ?>
+						<div class="connection-links-container">
 						<div class="connection-links columns-<?php echo count($links); ?>">
 						<div>
 							<?php foreach( $links as $link_column ): ?>
@@ -319,11 +321,13 @@ class ConnectionHubRandomSpotlight_WidgetShortcodeControl extends WidgetShortcod
 							<?php endforeach; ?>
 						</div>
 						</div><!-- .connection-links -->
+						</div><!-- .connection-links-container -->
 		
 					</div><!-- .column-2 -->
 
-				</div>				
+				</div>	
 				</div><!-- .entry-content -->
+				</div><!-- .entry-content-container -->
 
 				</div><!-- .details -->
 	

@@ -50,8 +50,6 @@
 	
 	.post.connection .connection-links {
 		padding:0.5em !important;
-		background-color:#f6f6f6;
-		border:solid 1px #ccc;
 	}
 	
 	.post.connection .post-contents {
@@ -87,6 +85,18 @@
 		margin-right:0.5em;
 	}
 	
+	.post.connection .entry-content-container,
+	.post.connection .connection-links-container {
+		display:block;
+		overflow:hidden;
+		padding:0 !important;
+	}
+	
+	.post.connection .connection-links-container {
+		background-color:#f6f6f6;
+		border:solid 1px #ccc !important;
+	}
+	
 	.post.connection .entry-content,
 	.post.connection .connection-links {
 		display:table;
@@ -105,10 +115,6 @@
 		vertical-align: top;
 	}
 
-	.post.connection .connection-links {
-		border:solid 1px #ccc !important;
-	}
-	
 	.post.connection .entry-content .column-1 > div {
 		padding:0;
 	}
