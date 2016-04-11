@@ -10,6 +10,6 @@ Author URI: http://www.linkedin.com/in/crystalbarton
 
 
 require_once( __DIR__.'/control.php' );
-ConnectionHubRandomSpotlight_WidgetShortcodeControl::register_widget();
-ConnectionHubRandomSpotlight_WidgetShortcodeControl::register_shortcode();
+ConnectionsHubRandomSpotlight_WidgetShortcodeControl::register_widget();
+ConnectionsHubRandomSpotlight_WidgetShortcodeControl::register_shortcode();
 

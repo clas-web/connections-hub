@@ -80,6 +80,7 @@ require_once( CONNECTIONS_HUB_PLUGIN_PATH.'/classes/model/model.php' );
 require_once( CONNECTIONS_HUB_PLUGIN_PATH.'/classes/model/synch-model.php' );
 require_once( CONNECTIONS_HUB_PLUGIN_PATH.'/classes/custom-post-type/connection.php' );
 require_once( CONNECTIONS_HUB_PLUGIN_PATH.'/classes/random-spotlight/main.php' );
+require_once( CONNECTIONS_HUB_PLUGIN_PATH.'/classes/search/main.php' );
 
 
 add_filter( 'query_vars', 'conhub_query_vars' );

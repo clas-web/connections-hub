@@ -1,6 +1,6 @@
 <?php
 
-require_once( __DIR__.'/widget-shortcode-control.php' );
+require_once( dirname( __DIR__ ) . '/widget-shortcode-control.php' );
 
 
 /**
@@ -12,8 +12,8 @@ require_once( __DIR__.'/widget-shortcode-control.php' );
  * @package    connections-hub
  * @author     Crystal Barton <atrus1701@gmail.com>
  */
-if( !class_exists('ConnectionHubRandomSpotlight_WidgetShortcodeControl') ):
-class ConnectionHubRandomSpotlight_WidgetShortcodeControl extends WidgetShortcodeControl
+if( !class_exists('ConnectionsHubRandomSpotlight_WidgetShortcodeControl') ):
+class ConnectionsHubRandomSpotlight_WidgetShortcodeControl extends WidgetShortcodeControl
 {
 	/**
 	 * The minimum number of connection-link pairs for the random spotlight.
