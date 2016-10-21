@@ -268,14 +268,16 @@ class Connections_ConnectionCustomPostType
 	 */
 	public static function add_meta_boxes()
 	{
-		add_meta_box( 
-			'connections_info_box_connections_info',
-			'Connection Info',
-			array( 'Connections_ConnectionCustomPostType', 'info_box_connections_info' ),
-			'connection',
-			'normal',
-			'high'
-		);
+		if (current_user_can( "customize" )) {
+			add_meta_box( 
+				'connections_info_box_connections_info',
+				'Connection Info',
+				array( 'Connections_ConnectionCustomPostType', 'info_box_connections_info' ),
+				'connection',
+				'normal',
+				'high'
+			);
+		}
 		add_meta_box(
 			'connections_info_box_imported_content',
 			'Content',
@@ -292,14 +294,16 @@ class Connections_ConnectionCustomPostType
 			'normal',
 			'high'
 		);
-		add_meta_box( 
-			'connections_info_box_synch_data',
-			'Connection Type',
-			array( 'Connections_ConnectionCustomPostType', 'info_box_synch_data' ),
-			'connection',
-			'side',
-			'high'
-		);
+		if (current_user_can( "customize" )) {
+			add_meta_box( 
+				'connections_info_box_synch_data',
+				'Connection Type',
+				array( 'Connections_ConnectionCustomPostType', 'info_box_synch_data' ),
+				'connection',
+				'side',
+				'high'
+			);
+		}
 	}
 	
 	
