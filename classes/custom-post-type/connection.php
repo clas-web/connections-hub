@@ -16,7 +16,6 @@ add_action( 'init', 'connection_remove_post_type_support' );
 function connection_remove_post_type_support () {
 	if ( !current_user_can('customize')) {
 		 remove_post_type_support('connection', 'title');
-		 remove_post_type_support('connection', 'slug');
 	}
 }
 
