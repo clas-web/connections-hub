@@ -12,6 +12,13 @@ add_filter( 'views_edit-connection', array( 'Connections_ConnectionCustomPostTyp
 add_filter( 'manage_edit-connection_columns', array( 'Connections_ConnectionCustomPostType', 'all_connections_columns_key' ) );
 add_action( 'manage_connection_posts_custom_column', array( 'Connections_ConnectionCustomPostType', 'all_connections_columns_value' ), 10, 2 );
 
+add_action( 'init', 'connection_remove_post_type_support' );
+function connection_remove_post_type_support () {
+	if ( !current_user_can('customize')) {
+		 remove_post_type_support('connection', 'title');
+		 remove_post_type_support('connection', 'slug');
+	}
+}
 
 /**
  * The main class that controls the Connections custom post type.
