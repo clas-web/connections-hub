@@ -11,6 +11,14 @@
 add_filter( 'posts_join', 'conhub_posts_join', 10, 2 );
 add_filter( 'posts_orderby', 'conhub_posts_orderby', 10, 2 );
 
+// Disable certain connections fields for non-admin users
+wp_register_script('admin_title_disable', CONNECTIONS_HUB_PLUGIN_URL.'/scripts/admin_title_disable.js');
+
+function disableAdminTitle () {
+	if ( !current_user_can('manage_categories')) {
+		wp_enqueue_script('admin_title_disable');
+	}
+}
 
 /**
  * If a connections post, then join the meta value for key 'sort-title'.
