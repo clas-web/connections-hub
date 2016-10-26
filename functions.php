@@ -15,7 +15,7 @@ add_filter( 'posts_orderby', 'conhub_posts_orderby', 10, 2 );
 wp_register_script('admin_title_disable', CONNECTIONS_HUB_PLUGIN_URL.'/scripts/admin_title_disable.js');
 
 function disableAdminTitle () {
-	if ( !current_user_can('manage_categories')) {
+	if ( !current_user_can('customize')) {
 		wp_enqueue_script('admin_title_disable');
 	}
 }
