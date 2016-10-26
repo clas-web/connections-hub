@@ -5,6 +5,42 @@
  * @package    connections-hub
  * @author     Crystal Barton <atrus1701@gmail.com>
  */
+ 
+ function wpsites_remove_author_capabilities() {
+    // Get the role object.
+    $role = get_role( 'author' );        
+    $role->remove_cap( 'edit_posts' );
+    $role->remove_cap( 'publish_posts' ); 
+
+}
+add_action( 'init', 'wpsites_remove_author_capabilities' );
+
+ /**
+ * Remove menu items from authors.
+ *
+ * 
+ */
+
+function remove_menus() {
+	$author = wp_get_current_user();
+	
+	if (isset($author->roles[0])) { 
+		$current_role = $author->roles[0];
+	}else{
+		$current_role = 'no_role';
+	}
+
+	if ($current_role == 'author') {
+		remove_menu_page( 'tools.php' );
+		remove_menu_page( 'upload.php' );
+		remove_menu_page( 'admin.php?page=jetpack');
+		remove_menu_page( 'edit-comments.php' );
+		remove_menu_page( 'edit.php' );
+		remove_menu_page( 'edit.php?post_type=connection' );
+	}  
+}
+
+add_action( 'admin_menu', 'remove_menus' );
 
 
 // Order the Connections posts by the sort title.
