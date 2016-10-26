@@ -320,22 +320,27 @@ class Connections_ConnectionCustomPostType
 		if( !array_key_exists($site_type, $site_types) )
 			$site_type = 'wp';
 			
+		if (!current_user_can( "customize" ) ) {
+			$access = " readonly";
+			$options = " disabled";
+		}
+			
 		?>
 		<label for="connections-sort-title">Sort Title</label><br/>
-		<input type="text" id="connections-sort-title" name="connections-sort-title" value="<?php echo esc_attr($sort_title); ?>" style="width:100%" /><br/>
+		<input type="text" id="connections-sort-title" name="connections-sort-title" value="<?php echo esc_attr($sort_title); ?>" <?php print $access ?> style="width:100%" /><br/>
 
 		<label for="connections-name">Username</label><br/>
-		<input type="text" id="connections-username" name="connections-username" value="<?php echo esc_attr($username); ?>" style="width:100%" /><br/>
+		<input type="text" id="connections-username" name="connections-username" value="<?php echo esc_attr($username); ?>" <?php print $access ?> style="width:100%" /><br/>
 
 		<?php if( $entry_method == 'synch' ): ?>
 		
 		<label for="connections-url">URL</label><br/>
-		<input type="text" id="connections-url" name="connections-url" value="<?php echo esc_attr($url); ?>" style="width:100%" /><br/>
+		<input type="text" id="connections-url" name="connections-url" value="<?php echo esc_attr($url); ?>" <?php print $access ?> style="width:100%" /><br/>
 
 		<label for="connections-site-type">Site Type</label><br/>
 		<select name="connections-site-type">
 			<?php foreach( $site_types as $name => $value ): ?>
-				<option value="<?php echo $name; ?>" <?php echo ($site_type == $name ? 'selected' : ''); ?>><?php echo $value; ?></option>
+				<option value="<?php echo $name; ?>" <?php echo ($site_type == $name ? 'selected' : ''); ?><?php print $options ?>><?php echo $value; ?></option>
 			<?php endforeach; ?>
 		</select>
 		
@@ -354,6 +359,7 @@ class Connections_ConnectionCustomPostType
 		wp_nonce_field( CONNECTIONS_HUB_PLUGIN_PATH, 'connection-custom-post-type-entry-form' );
 
 		$entry_method = self::get_entry_method( $post->ID );
+		$url = get_post_meta( $post->ID, 'url', true );
 	
 		$search_content = get_post_meta( $post->ID, 'search-content', true );
 
@@ -378,6 +384,7 @@ class Connections_ConnectionCustomPostType
 		$entry_method = self::get_entry_method( $post->ID );
 		$contact_info = get_post_meta($post->ID, 'contact-info', true);
 		$contact_info_filter = get_post_meta($post->ID, 'contact-info-filter', true);
+		$url = get_post_meta( $post->ID, 'url', true );
 		
 		$disabled = '';
 		if( $entry_method != 'manual' ) $disabled = 'disabled';
@@ -405,14 +412,17 @@ class Connections_ConnectionCustomPostType
 	public static function info_box_synch_data( $post )
 	{
 		$entry_method = self::get_entry_method( $post->ID );
+		if (!current_user_can( "customize" ) ) 
+			$options = " disabled";
+
 		?>
 
 		<div style="display:inline;margin-right:10px">
-			<input type="radio" name="connection-entry-method-type" value="manual" <?php echo ($entry_method == 'manual' ? 'checked' : ''); ?> />
+			<input type="radio" name="connection-entry-method-type" value="manual" <?php echo ($entry_method == 'manual' ? 'checked' : $options); ?> />
 			Manual
 		</div>
 		<div style="display:inline;margin-right:10px">
-			<input type="radio" name="connection-entry-method-type" value="synch" <?php echo ($entry_method == 'synch' ? 'checked' : ''); ?> />
+			<input type="radio" name="connection-entry-method-type" value="synch" <?php echo ($entry_method == 'synch' ? 'checked' : $options); ?> />
 			Synch
 		</div>
 
