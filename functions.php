@@ -6,7 +6,13 @@
  * @author     Crystal Barton <atrus1701@gmail.com>
  */
  
- function wpsites_remove_author_capabilities() {
+ /**
+ * Remove capabilities from authors.
+ *
+ * 
+ */
+
+function wpsites_remove_author_capabilities() {
     // Get the role object.
     $role = get_role( 'author' );        
     $role->remove_cap( 'edit_posts' );
@@ -55,6 +61,8 @@ function disableAdminTitle () {
 		wp_enqueue_script('admin_title_disable');
 	}
 }
+
+add_action('admin_enqueue_scripts', 'disableAdminTitle');
 
 /**
  * If a connections post, then join the meta value for key 'sort-title'.
