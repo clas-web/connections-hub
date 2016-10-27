@@ -399,10 +399,12 @@ class Connections_ConnectionCustomPostType
 			$contact_info = 'No contact info.';
 
 		?>
+		<?php if( $entry_method == 'synch' ): ?>
 		<?php print "<div class='connection-profile-link' style='margin-bottom: 5px;'>" ?>
 		<?php print "To update this, see: <a href='".$url."' target='_blank'>Profile Site</a>" ?>
 		<?php print "(updates may take up to 24 hours)" ?>
 		<?php print "</div>" ?>
+		<?php endif; ?>
 		<textarea name="connections-contact-info" style="width:100%;height:200px;" <?php echo $disabled; ?>><?php echo $contact_info; ?></textarea>
 		<input type="hidden" name="connections-contact-info-filter" value="no" />
 		<input type="checkbox" name="connections-contact-info-filter" value="yes" <?php checked( 'yes', $contact_info_filter ); ?> <?php echo $disabled; ?> />
