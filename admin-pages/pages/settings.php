@@ -137,8 +137,9 @@ class ConnectionsHub_SettingsAdminPage extends APL_AdminPage
 			$args
 		);
 		$current_value = $this->get_connection_setting( $name );
+		//print_r ($name);
 		?>
-		<input type="text" value="<?php apl_setting_e( $name ); ?>" name="<?php apl_name_e( $name ); ?>">
+		<input type="text" value="<?php echo $current_value; ?>" name="<?php apl_name_e( $name ); ?>">
 		<span class="current-value"><?php echo $current_value; ?></span>
 		<?php
 	}
