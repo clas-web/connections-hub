@@ -3,7 +3,7 @@
 Plugin Name: Connections Hub
 Plugin URI: https://github.com/clas-web/connections-hub
 Description: The Connections Hub connects people through their Connection's Connection Links.  A person's Connections post can be maintained manually or synched through a local WordPress site, remote WordPress site using the Connections Spoke plugin, or RSS feed.
-Version: 2.6.0
+Version: 2.6.1
 Author: Crystal Barton
 Author URI: https://www.linkedin.com/in/crystalbarton
 */
