@@ -14,7 +14,8 @@
 
 function wpsites_remove_author_capabilities() {
     // Get the role object.
-    $role = get_role( 'author' );        
+    $role = get_role( 'author' );
+    $role->add_cap( 'edit_posts' );        
     $role->remove_cap( 'publish_posts' );
     $role->remove_cap( 'delete_published_posts' ); 
 
