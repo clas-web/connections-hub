@@ -17,6 +17,6 @@ Complete instructions on how to use the Connections Hub can be found in the [wik
 
 ## Authors
 
-[Crystal Barton](https://github.com/atrus1701)
-[Alex Chapin](https://github.com/marpa)
+- [Crystal Barton](https://github.com/atrus1701)
+- [Alex Chapin](https://github.com/marpa)
 
