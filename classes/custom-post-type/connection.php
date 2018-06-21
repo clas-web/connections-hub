@@ -11,7 +11,7 @@ add_action( 'save_post_connection', array( 'Connections_ConnectionCustomPostType
 add_filter( 'views_edit-connection', array( 'Connections_ConnectionCustomPostType', 'all_connections_add_synch_button' ) );
 add_filter( 'manage_edit-connection_columns', array( 'Connections_ConnectionCustomPostType', 'all_connections_columns_key' ) );
 add_action( 'manage_connection_posts_custom_column', array( 'Connections_ConnectionCustomPostType', 'all_connections_columns_value' ), 10, 2 );
-
+add_filter( "manage_edit-connection_sortable_columns", array( 'Connections_ConnectionCustomPostType', "last_modified_column_register_sortable" ));
 
 /**
  * The main class that controls the Connections custom post type.
@@ -161,7 +161,7 @@ class Connections_ConnectionCustomPostType
 			'description'   => "Holds our $full_plural data",
 			'public'        => true,
 			'menu_position' => 5,
-			'supports'      => array( 'title', 'author' ),
+			'supports'      => array( 'title', 'author', 'revisions' ),
 			'taxonomies'    => array(),
 			'rewrite'       => array( 'slug' => $slug ),
 			'has_archive'   => true,
@@ -596,7 +596,7 @@ class Connections_ConnectionCustomPostType
 	{
 		$columns['url'] = 'Source';
 		$columns['contact-info'] = 'Contact Info';
-		
+		$columns['modified'] = 'Last Modified';
 		return $columns;
 	}
 	
@@ -644,6 +644,21 @@ class Connections_ConnectionCustomPostType
 					$contact_info = wpautop( $contact_info );
 				
 				echo $contact_info;
+				break;
+		
+			case 'modified':
+				$m_orig		= get_post_field( 'post_modified', $post_id, 'raw' );
+				$m_stamp	= strtotime( $m_orig );
+				$modified	= date('n/j/y @ g:i a', $m_stamp );
+				$modr_id	= get_post_meta( $post_id, '_edit_last', true );
+				$auth_id	= get_post_field( 'post_author', $post_id, 'raw' );
+				$user_id	= !empty( $modr_id ) ? $modr_id : $auth_id;
+				$user_info	= get_userdata( $user_id );
+		
+				echo '<p class="mod-date">';
+				echo '<em>'.$modified.'</em><br />';
+				echo 'by <strong>'.$user_info->display_name.'<strong>';
+				echo '</p>';
 				break;
 		}
 	}
@@ -710,6 +725,12 @@ class Connections_ConnectionCustomPostType
 
 		return $search_content;
 	}
-}
+
+	public function last_modified_column_register_sortable( $columns ) {
+		$columns["modified"] = "last_modified";
+        return $columns;
+	}
+	
+	}
 endif;
 

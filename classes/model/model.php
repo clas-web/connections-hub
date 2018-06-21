@@ -339,6 +339,11 @@ class ConnectionsHub_Model
 				$conns[$i]['sort-title'] = get_post_meta( $cp->ID, 'sort-title', true );
 				$conns[$i]['slug'] = $cp->post_name;
 				
+				$modified		= date('n/j/y @ g:i a', strtotime(get_post_field( 'post_modified', $cp->ID, 'raw' )));
+				$modr_id	= get_post_meta( $cp->ID, '_edit_last', true );
+				$user_id	= !empty( $modr_id ) ? get_userdata($modr_id) : get_userdata(get_post_field( 'post_author', $cp->ID, 'raw' ));
+				$conns[$i]['last-modified'] = $modified.' by '.$user_id->display_name;
+				
 				$conns[$i]['entry-method'] = get_post_meta( $cp->ID, 'entry-method', true );
 				$conns[$i]['site-type'] = get_post_meta( $cp->ID, 'site-type', true );
 				$conns[$i]['url'] = get_post_meta( $cp->ID, 'url', true );
@@ -375,6 +380,7 @@ class ConnectionsHub_Model
 			'title',
 			'sort-title',
 			'slug',
+			'last-modified',
 			
 			'entry-method',
 			'site-type',
