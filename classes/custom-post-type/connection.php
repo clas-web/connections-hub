@@ -324,6 +324,10 @@ class Connections_ConnectionCustomPostType
 			$access = " readonly";
 			$options = " disabled";
 		}
+		else{
+			$access = "";
+			$options = "";
+		}
 			
 		?>
 		<label for="connections-sort-title">Sort Title</label><br/>
@@ -424,7 +428,7 @@ class Connections_ConnectionCustomPostType
 		$entry_method = self::get_entry_method( $post->ID );
 		if (!current_user_can( "customize" ) ) 
 			$options = " disabled";
-
+		else $options = "";
 		?>
 
 		<div style="display:inline;margin-right:10px">

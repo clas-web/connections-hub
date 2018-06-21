@@ -189,6 +189,11 @@ class ConnectionsHub_SynchConnectionsAdminPage extends APL_AdminPage
 				}
 				
 				$data = $this->model->synch->get_data( $input['post_id'] );
+				if($data['last-modified'] < get_post_modified_time("Y-m-d H:i:s",true,$input['post_id'])){
+					$this->ajax_set( 'status', 'success' );
+					$this->ajax_set( 'message', 'No Need to Sync. The connection was updated '.get_post_modified_time("Y-m-d H:i:s",true,$input['post_id']).' and the synced post was modified '.$data['last-modified']);
+					break;
+				}
 				if( $data === false )
 				{
 					$this->ajax_set( 'status', 'failure' );
@@ -198,7 +203,7 @@ class ConnectionsHub_SynchConnectionsAdminPage extends APL_AdminPage
 				
 				$this->model->synch->synch( $input['post_id'], $data );
 				$this->ajax_set( 'status', 'success' );
-				$this->ajax_set( 'message', 'OK' );
+				$this->ajax_set( 'message', 'Synced connection post');
 				break;
 				
 			default:
