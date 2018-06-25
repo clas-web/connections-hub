@@ -1,8 +1,5 @@
 <?php
 
-require_once( dirname( __DIR__ ) . '/widget-shortcode-control.php' );
-
-
 /**
  * Controls the setup and display of the Connections Search widget and shortcode.
  * 

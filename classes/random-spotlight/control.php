@@ -1,8 +1,5 @@
 <?php
 
-require_once( dirname( __DIR__ ) . '/widget-shortcode-control.php' );
-
-
 /**
  * Controls the setup and display of the Random Spotlight widget and shortcode.
  * 
