@@ -276,7 +276,7 @@ class ConnectionsHubRandomSpotlight_WidgetShortcodeControl extends WidgetShortco
 				
 				<div class="connection-groups">
 					<?php foreach( $conn['groups'] as $group ): ?>
-					<div><?php echo '<a href="'.$group['link'].'" title="'.$group['name'].'">'.$group['name'].'</a>'; ?></div>
+					<div><?php relppl_print_connection_group_link ( $group ); ?></div>
 					<?php endforeach; ?>
 				</div><!-- .connection-groups -->
 				
