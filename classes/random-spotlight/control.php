@@ -220,7 +220,7 @@ class ConnectionsHubRandomSpotlight_WidgetShortcodeControl extends WidgetShortco
 
 		<?php echo $args['before_title']; 
 		$tag_object['name'] = $tag->name;
-		$tag_object['link'] = ;
+		$tag_object['link'] = get_term_link($tag->slug, 'connection-link');
 		relppl_print_connection_group_link( $tag_object );
 		echo $args['after_title']; ?>
 		
