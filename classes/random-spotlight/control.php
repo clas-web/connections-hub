@@ -198,8 +198,7 @@ class ConnectionsHubRandomSpotlight_WidgetShortcodeControl extends WidgetShortco
 					),
 				),
 			)
-		);
-		
+		);		
 
 		// Pick 2 random posts.
 		if( count($posts) < 3 )
@@ -219,9 +218,11 @@ class ConnectionsHubRandomSpotlight_WidgetShortcodeControl extends WidgetShortco
 		
 		<div class="spotlight-connections">
 
-		<?php echo $args['before_title']; ?>
-		<a href="<?php echo get_term_link($tag->slug, 'connection-link'); ?>" title="<?php echo $tag->name; ?>"><?php echo $tag->name; ?></a>
-		<?php echo $args['after_title']; ?>
+		<?php echo $args['before_title']; 
+		$tag_object['name'] = $tag->name;
+		$tag_object['link'] = ;
+		relppl_print_connection_group_link( $tag_object );
+		echo $args['after_title']; ?>
 		
 		<?php foreach( $spotlight_posts as $p ): ?>
 		
@@ -310,7 +311,8 @@ class ConnectionsHubRandomSpotlight_WidgetShortcodeControl extends WidgetShortco
 							<div>
 								<?php foreach( $link_column as $link ): ?>
 								<div>
-								<?php echo vtt_get_anchor( $link['link'], $link['class'], null, $link['name'] ); ?>
+								<?php 								
+								relppl_print_connection_group_link( $link ); ?>
 								</div>	
 								<?php endforeach; ?>
 							</div>
