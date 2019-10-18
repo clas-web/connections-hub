@@ -223,7 +223,7 @@ if ( ! class_exists( 'ConnectionsHubRandomSpotlight_WidgetShortcodeControl' ) ) 
 			echo $args['before_title'];
 			$tag_object['name'] = $tag->name;
 			$tag_object['link'] = get_term_link( $tag->slug, 'connection-link' );
-			relppl_print_connection_group_link( $tag_object );
+			relppl_print_connection_url( $tag_object );
 			echo $args['after_title'];
 			?>
 
@@ -278,7 +278,7 @@ if ( ! class_exists( 'ConnectionsHubRandomSpotlight_WidgetShortcodeControl' ) ) 
 
 				<div class="connection-groups">
 					<?php foreach ( $conn['groups'] as $group ) : ?>
-					<div><?php relppl_print_connection_group_link( $group ); ?></div>
+					<div><?php relppl_print_connection_url( $group ); ?></div>
 					<?php endforeach; ?>
 				</div><!-- .connection-groups -->
 
@@ -313,7 +313,7 @@ if ( ! class_exists( 'ConnectionsHubRandomSpotlight_WidgetShortcodeControl' ) ) 
 								<?php foreach ( $link_column as $link ) : ?>
 								<div>
 									<?php
-									relppl_print_connection_group_link( $link );
+									relppl_print_connection_url( $link );
 									?>
 								</div>	
 								<?php endforeach; ?>
