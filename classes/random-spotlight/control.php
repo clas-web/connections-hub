@@ -222,6 +222,7 @@ if ( ! class_exists( 'ConnectionsHubRandomSpotlight_WidgetShortcodeControl' ) ) 
 			<?php
 			echo $args['before_title'];
 			$tag_object['name'] = $tag->name;
+			$tag_object['slug'] = $tag->slug;
 			$tag_object['link'] = get_term_link( $tag->slug, 'connection-link' );
 			relppl_print_connection_url( $tag_object );
 			echo $args['after_title'];
@@ -235,6 +236,7 @@ if ( ! class_exists( 'ConnectionsHubRandomSpotlight_WidgetShortcodeControl' ) ) 
 				foreach ( $groups as $group ) {
 					$connection_groups[] = array(
 						'name' => $group->name,
+						'slug' => $group->slug,
 						'link' => get_term_link( $group, 'connection-group' ),
 					);
 				}
@@ -244,6 +246,7 @@ if ( ! class_exists( 'ConnectionsHubRandomSpotlight_WidgetShortcodeControl' ) ) 
 				foreach ( $links as $link ) {
 					$connection_links[] = array(
 						'name' => $link->name,
+						'slug' => $link->slug,
 						'link' => get_term_link( $link, 'connection-link' ),
 					);
 				}
