@@ -9,6 +9,8 @@
 
 	.random-spotlight-control h2.title {
 		border-bottom:solid 1px #000;
+		font-weight: normal;
+		display: block;
 	}
 
 	.random-spotlight-control .spotlight-connections h2.title {
@@ -19,6 +21,10 @@
 
 	.random-spotlight-control .find-more {
 		text-align:right;
+	}
+	
+	.spotlight-connections {
+		padding-top: 3px;	
 	}
 
 	.post.connection {
