@@ -726,7 +726,7 @@ class Connections_ConnectionCustomPostType
 		return $search_content;
 	}
 
-	public function last_modified_column_register_sortable( $columns ) {
+	public static function last_modified_column_register_sortable( $columns ) {
 		$columns["modified"] = "last_modified";
         return $columns;
 	}

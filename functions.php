@@ -54,11 +54,11 @@ add_action( 'admin_menu', 'remove_menus', 999 );
 add_filter( 'posts_join', 'conhub_posts_join', 10, 2 );
 
 // Disable certain connections fields for non-admin users
-wp_register_script('admin_title_disable', CONNECTIONS_HUB_PLUGIN_URL.'/scripts/admin_title_disable.js');
+//wp_register_script('admin_title_disable', CONNECTIONS_HUB_PLUGIN_URL.'/scripts/admin_title_disable.js');
 
 function disableAdminTitle () {
 	if ( !current_user_can('customize')) {
-		wp_enqueue_script('admin_title_disable');
+		//wp_enqueue_script('admin_title_disable');
 	}
 }
 
