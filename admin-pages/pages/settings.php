@@ -7,7 +7,7 @@
  * @author     Crystal Barton <atrus1701@gmail.com>
  */
 if( !class_exists('ConnectionsHub_SettingsAdminPage') ):
-class ConnectionsHub_SettingsAdminPage extends APL_AdminPage
+class ConnectionsHub_SettingsAdminPage extends ConnectionsHub_AdminPage
 {
 	/**
 	 * The main model for the Connections Hub plugin.
@@ -15,9 +15,8 @@ class ConnectionsHub_SettingsAdminPage extends APL_AdminPage
 	 */
 	private $model = null;
 	
-	
 	/**
-	 * Controller.
+	 * Constructor.
 	 */
 	public function __construct(
 		$name = 'settings',
@@ -29,197 +28,211 @@ class ConnectionsHub_SettingsAdminPage extends APL_AdminPage
 		$this->model = ConnectionsHub_Model::get_instance();
 	}
 	
-
 	/**
 	 * Register each individual settings for the Settings API.
 	 */
 	public function register_settings()
 	{
-		$this->register_setting( CONNECTIONS_HUB_OPTIONS );
+		// Register the settings - the first parameter is the option group, 
+		// which should match what we use in settings_fields()
+		register_setting( 
+			CONNECTIONS_HUB_OPTIONS, 
+			CONNECTIONS_HUB_OPTIONS,
+			array(
+				'sanitize_callback' => array( $this, 'sanitize_settings' )
+			)
+		);
 	}
 	
-
 	/**
 	 * Add the sections used for the Settings API. 
 	 */
 	public function add_settings_sections()
 	{
-		$this->add_section(
+		add_settings_section(
 			'connections-custom-post-type',
 			'Connections custom post type',
-			'print_section_connections_custom_post_type'
+			array( $this, 'print_section_connections_custom_post_type' ),
+			'connections_hub_settings'
 		);
-		$this->add_section(
+		add_settings_section(
 			'connections-group-taxonomy',
 			'Connections Group taxonomy',
-			'print_section_connections_group_taxonomy'
+			array( $this, 'print_section_connections_group_taxonomy' ),
+			'connections_hub_settings'
 		);
-		$this->add_section(
+		add_settings_section(
 			'connections-link-taxonomy',
 			'Connections Link taxonomy',
-			'print_section_connections_link_taxonomy'
+			array( $this, 'print_section_connections_link_taxonomy' ),
+			'connections_hub_settings'
 		);
 	}
 	
-	
 	/**
-	 * Add the settings used for the Settings API. 
+	 * Add the fields used for the Settings API.
 	 */
 	public function add_settings_fields()
 	{
-		$sections = array( 
-			'connection'	=> 'connections-custom-post-type',
-			'group'			=> 'connections-group-taxonomy',
-			'link'			=> 'connections-link-taxonomy',
-		);
-		$names = array(
-			'full_single'	=> 'Full Single',
-			'full_plural'	=> 'Full Plural',
-			'short_single'	=> 'Short Single',
-			'short_plural'	=> 'Short Plural',
-			'slug'			=> 'Slug',
-		);
+		$options = get_option( CONNECTIONS_HUB_OPTIONS, array() );
 		
-		foreach( $sections as $sname => $section )
-		{
-			foreach( $names as $name => $title )
-			{
-				$this->add_field(
-					$section,
-					$name,
-					$title,
-					'print_field_override_name',
-					array( $sname, $name )
-				);
-			}
-		}
+		// Custom post type fields
+		$names = array(
+			'connections_custom_post_type_name' => 'Name',
+			'connections_custom_post_type_plural_name' => 'Plural Name',
+			'connections_custom_post_type_slug' => 'Slug',
+		);
+		$this->add_custom_post_type_fields( 'connections-custom-post-type', $names );
+		
+		// Group taxonomy fields
+		$names = array(
+			'connections_group_taxonomy_name' => 'Name',
+			'connections_group_taxonomy_plural_name' => 'Plural Name',
+			'connections_group_taxonomy_slug' => 'Slug',
+		);
+		$this->add_custom_post_type_fields( 'connections-group-taxonomy', $names );
+		
+		// Link taxonomy fields
+		$names = array(
+			'connections_link_taxonomy_name' => 'Name',
+			'connections_link_taxonomy_plural_name' => 'Plural Name',
+			'connections_link_taxonomy_slug' => 'Slug',
+		);
+		$this->add_custom_post_type_fields( 'connections-link-taxonomy', $names );
 	}
 	
+	/**
+	 * Add custom post type fields to a section.
+	 */
+	private function add_custom_post_type_fields( $section, $names )
+	{
+		foreach( $names as $name => $title )
+		{
+			add_settings_field(
+				$name,
+				$title,
+				array( $this, 'print_input_field' ),
+				'connections_hub_settings',
+				$section,
+				array( 'name' => $name )
+			);
+		}
+	}
 	
 	/**
 	 * Print the any instructions for the Connections custom post type section.
-	 * @param  Array  $args  The passed args.
 	 */
 	public function print_section_connections_custom_post_type( $args )
 	{
-		apl_print('print_section_connections_custom_post_type');
+		echo '<p>Configure the custom post type settings for Connections.</p>';
 	}
-
-
+	
 	/**
 	 * Print the any instructions for the Connections group taxonomy section.
-	 * @param  Array  $args  The passed args.
 	 */
 	public function print_section_connections_group_taxonomy( $args )
 	{
-		apl_print('print_section_connections_group_taxonomy');
+		echo '<p>Configure the group taxonomy settings for Connections.</p>';
 	}
-
-
+	
 	/**
 	 * Print the any instructions for the Connections link taxonomy section.
-	 * @param  Array  $args  The passed args.
 	 */
 	public function print_section_connections_link_taxonomy( $args )
 	{
-		apl_print('print_section_connections_link_taxonomy');
-	}
-
-
-	/**
-	 * Print override textbox for post type or taxonomy field.
-	 * @param  Array  $args  The passed args.
-	 */
-	public function print_field_override_name( $args )
-	{
-		$name = array_merge( 
-			array( CONNECTIONS_HUB_OPTIONS, 'name' ),
-			$args
-		);
-		$current_value = $this->get_connection_setting( $name );
-		//print_r ($name);
-		?>
-		<input type="text" value="<?php echo $current_value; ?>" name="<?php apl_name_e( $name ); ?>">
-		<span class="current-value"><?php echo $current_value; ?></span>
-		<?php
+		echo '<p>Configure the link taxonomy settings for Connections.</p>';
 	}
 	
-	
 	/**
-	 * Get a Connections setting.
-	 * @param  Array  $args  The passed args.
-	 * @return  string|null  The setting, or Null if not found.
+	 * Print an input field for settings.
 	 */
-	protected function get_connection_setting( $args )
+	public function print_input_field( $args )
 	{
-		$settings = Connections_ConnectionCustomPostType::get_settings();
+		$name = $args['name'];
+		$options = get_option( CONNECTIONS_HUB_OPTIONS, array() );
+		$current_value = isset( $options[$name] ) ? $options[$name] : '';
 		
-		$value = null;
-
-		for( $i = 1; $i < count($args); $i++ )
-		{
-			if( !array_key_exists($args[$i], $settings) ) break;
-		
-			$settings = $settings[$args[$i]];
-		
-			if( count($args) == $i + 1 )
-			{
-				$value = $settings;
-				break;
-			}
-		
-			if( !is_array($settings) ) break;
-		}
-	
-		return $value;	
+		echo '<input type="text" value="' . esc_attr($current_value) . '" name="' . esc_attr(CONNECTIONS_HUB_OPTIONS) . '[' . esc_attr($name) . ']" class="regular-text" />';
 	}
 	
-	
 	/**
-	 * Processes the current admin page's Settings API input.
-	 * @param  array  $settings  The inputted settings from the Settings API.
-	 * @param  string  $option  The option key of the settings input array.
-	 * @return  array  The resulted array to store in the db.
+	 * Sanitize settings before saving.
 	 */
-	public function process_settings( $settings, $option )
+	public function sanitize_settings( $input )
 	{
-		$settings = parent::process_settings( $settings, $option );
-		if( $option !== CONNECTIONS_HUB_OPTIONS ) return $settings;
+		$sanitized = array();
 		
-		$sections = array( 
-			'connection',
-			'group',
-			'link',
-		);
-		
-		foreach( $settings['name'] as &$section )
-		{
-			foreach( $section as $key => $value )
-			{
-				if( empty($value) ) unset($section[$key]);
+		if( is_array($input) ) {
+			foreach( $input as $key => $value ) {
+				$sanitized[$key] = sanitize_text_field( $value );
 			}
 		}
 		
-		return $settings;
+		return $sanitized;
 	}
 	
-	
 	/**
-	 * Processes the current admin page.
+	 * Process form submission.
 	 */
 	public function process()
 	{
+		if( !isset($_POST['action']) || $_POST['action'] !== 'save_settings' ) return;
+		
+		// Verify nonce
+		if( !wp_verify_nonce( $_POST['connections_hub_nonce'], 'connections_hub_save_settings' ) ) {
+			$this->add_notice( 'Security check failed. Please try again.', true );
+			return;
+		}
+		
+		// Get submitted data
+		$submitted_data = isset($_POST[CONNECTIONS_HUB_OPTIONS]) ? $_POST[CONNECTIONS_HUB_OPTIONS] : array();
+		
+		// Sanitize the data
+		$sanitized_data = $this->sanitize_settings( $submitted_data );
+		
+		// Save to database
+		update_option( CONNECTIONS_HUB_OPTIONS, $sanitized_data );
+		
+		// Add success notice
+		$this->add_notice( 'Settings saved successfully!', true );
 	}
-	
-	
+
+	/**
+	 * Print settings sections and fields (override parent method).
+	 */
+	public function print_settings()
+	{
+		?>
+		<form method="POST">
+		<?php wp_nonce_field( 'connections_hub_save_settings', 'connections_hub_nonce' ); ?>
+		<input type="hidden" name="action" value="save_settings" />
+		
+		<div class="top-submit"><?php submit_button(); ?></div>
+		<div style="clear:both"></div>
+		
+		<?php
+		do_settings_sections( 'connections_hub_settings' );
+		?>
+		
+		<div class="bottom-submit"><?php submit_button(); ?></div>
+		
+		</form>
+		<?php
+	}
+
 	/**
 	 * Displays the current admin page.
 	 */
 	public function display()
 	{
-		$this->print_settings();
+		?>
+		<div class="wrap">
+			<h1>Connections Hub Settings</h1>
+			<p>Configure the settings for the Connections Hub plugin.</p>
+			<?php $this->print_settings(); ?>
+		</div>
+		<?php
 	}
 
-} // class ConnectionsHub_SettingsAdminPage extends APL_AdminPage
+} // class ConnectionsHub_SettingsAdminPage
 endif; // if( !class_exists('ConnectionsHub_SettingsAdminPage') )
-

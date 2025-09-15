@@ -323,40 +323,47 @@ class ConnectionsHub_Model
 			$connection_groups = wp_get_post_terms( $cp->ID, 'connection-group' );
 			$connection_links = wp_get_post_terms( $cp->ID, 'connection-link' );
 			
-			if( is_wp_error($connection_groups) || count($connection_groups) == 0 )
-				$connection_groups = array( '' );
+			// Convert connection-groups to names and join with commas (same as connection-links)
+			$group_names = array();
+			if( !is_wp_error($connection_groups) && count($connection_groups) > 0 ) {
+				foreach( $connection_groups as $group ) {
+					$group_names[] = is_string($group) ? $group : $group->name;
+				}
+			}
 			
-			foreach( $connection_links as &$link )
-			{
-				$link = $link->name;
+			// Convert connection-links to names and join with commas
+			$link_names = array();
+			if( !is_wp_error($connection_links) && count($connection_links) > 0 ) {
+				foreach( $connection_links as $link ) {
+					$link_names[] = is_string($link) ? $link : $link->name;
+				}
 			}
 
-			foreach( $connection_groups as $group )
-			{
-				$conns[$i]['username'] = get_post_meta( $cp->ID, 'username', true );
-				
-				$conns[$i]['title'] = $cp->post_title;
-				$conns[$i]['sort-title'] = get_post_meta( $cp->ID, 'sort-title', true );
-				$conns[$i]['slug'] = $cp->post_name;
-				
-				$modified		= date('n/j/y @ g:i a', strtotime(get_post_field( 'post_modified', $cp->ID, 'raw' )));
-				$modr_id	= get_post_meta( $cp->ID, '_edit_last', true );
-				$user_id	= !empty( $modr_id ) ? get_userdata($modr_id) : get_userdata(get_post_field( 'post_author', $cp->ID, 'raw' ));
-				$conns[$i]['last-modified'] = $modified.' by '.$user_id->display_name;
-				
-				$conns[$i]['entry-method'] = get_post_meta( $cp->ID, 'entry-method', true );
-				$conns[$i]['site-type'] = get_post_meta( $cp->ID, 'site-type', true );
-				$conns[$i]['url'] = get_post_meta( $cp->ID, 'url', true );
-				
-				$conns[$i]['contact-info'] = get_post_meta( $cp->ID, 'contact-info', true );
-				
-				$conns[$i]['connection-group'] = ( is_string($group) ? $group : $group->name );
-				$conns[$i]['connection-link'] = implode( ',', $connection_links );
-				
-				$conns[$i]['content'] = $cp->post_content;
-				
-				$i++;
-			}
+			// Create single row per connection (not per group)
+			$conns[$i]['username'] = get_post_meta( $cp->ID, 'username', true );
+			
+			$conns[$i]['title'] = $cp->post_title;
+			$conns[$i]['sort-title'] = get_post_meta( $cp->ID, 'sort-title', true );
+			$conns[$i]['slug'] = $cp->post_name;
+			
+			$modified		= date('n/j/y @ g:i a', strtotime(get_post_field( 'post_modified', $cp->ID, 'raw' )));
+			$modr_id	= get_post_meta( $cp->ID, '_edit_last', true );
+			$user_id	= !empty( $modr_id ) ? get_userdata($modr_id) : get_userdata(get_post_field( 'post_author', $cp->ID, 'raw' ));
+			$conns[$i]['last-modified'] = $modified.' by '.$user_id->display_name;
+			
+			$conns[$i]['entry-method'] = get_post_meta( $cp->ID, 'entry-method', true );
+			$conns[$i]['site-type'] = get_post_meta( $cp->ID, 'site-type', true );
+			$conns[$i]['url'] = get_post_meta( $cp->ID, 'url', true );
+			
+			$conns[$i]['contact-info'] = get_post_meta( $cp->ID, 'contact-info', true );
+			
+			// Both taxonomies now use comma-separated format
+			$conns[$i]['connection-group'] = implode( ',', $group_names );
+			$conns[$i]['connection-link'] = implode( ',', $link_names );
+			
+			$conns[$i]['content'] = $cp->post_content;
+			
+			$i++;
 		}
 		
 		return $conns;
@@ -374,23 +381,38 @@ class ConnectionsHub_Model
 	{
 		$connections = $this->get_all_connections();
 		
+		// Clean up the data for CSV export (preserve HTML but make CSV-safe)
+		foreach( $connections as &$connection ) {
+			// Clean content field - preserve HTML but normalize whitespace
+			if( isset($connection['content']) ) {
+				// Normalize line breaks and excessive whitespace while preserving HTML
+				$content = preg_replace('/\r\n|\r|\n/', ' ', $connection['content']);
+				$content = preg_replace('/\s+/', ' ', $content);
+				$connection['content'] = trim( $content );
+			}
+			
+			// Clean contact-info field (replace line breaks with semicolons for readability)
+			if( isset($connection['contact-info']) ) {
+				// Replace line breaks with semicolons for better CSV readability
+				$contact_info = str_replace( array("\r\n", "\r", "\n"), '; ', $connection['contact-info'] );
+				// Clean up multiple spaces
+				$contact_info = preg_replace('/\s+/', ' ', $contact_info);
+				$connection['contact-info'] = trim( $contact_info );
+			}
+		}
+		
 		$headers = array(
 			'username',
-			
 			'title',
 			'sort-title',
 			'slug',
 			'last-modified',
-			
 			'entry-method',
 			'site-type',
 			'url',
-			
 			'contact-info',
-			
 			'connection-group',
 			'connection-link',
-			
 			'content',
 		);
 		

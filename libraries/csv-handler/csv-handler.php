@@ -110,7 +110,7 @@ class PHPUtil_CsvHandler
 					if( count($column) > 1 ):
     				foreach( $column as &$c )
     				{
-    					if( preg_match("/(?:${delimiter_esc}|${enclosure_esc}|${space_esc}|\s)/", $c) )
+    					if( preg_match("/(?:{$delimiter_esc}|{$enclosure_esc}|{$space_esc}|\s)/", $c) )
     					{
 	    					$c = self::$enclosure.str_replace(self::$enclosure, self::$enclosure.self::$enclosure, $c).self::$enclosure;
 	    				}
@@ -129,11 +129,11 @@ class PHPUtil_CsvHandler
 		
 		$outfile = fopen( 'php://output', 'w' );
 		
-		fputcsv( $outfile, $headers );
+		fputcsv( $outfile, $headers, ',', '"', '\\' );
 		
 		for( $i = 0; $i < count($rows); $i++ )
 		{
-			fputcsv( $outfile, $rows[$i] );
+			fputcsv( $outfile, $rows[$i], ',', '"', '\\' );
 		}
 		
 		fclose( $outfile );

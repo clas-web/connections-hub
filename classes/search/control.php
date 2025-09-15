@@ -10,7 +10,7 @@
  * @author     Crystal Barton <atrus1701@gmail.com>
  */
 if( !class_exists('ConnectionsHubSearch_WidgetShortcodeControl') ):
-class ConnectionsHubSearch_WidgetShortcodeControl extends WidgetShortcodeControl
+class ConnectionsHubSearch_WidgetShortcodeControl extends ConnectionsHub_WidgetShortcodeControl_Base
 {
 	/**
 	 * Constructor.

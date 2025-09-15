@@ -10,7 +10,7 @@
  * @author     Crystal Barton <atrus1701@gmail.com>
  */
 if( !class_exists('ConnectionsHubRandomSpotlight_WidgetShortcodeControl') ):
-class ConnectionsHubRandomSpotlight_WidgetShortcodeControl extends WidgetShortcodeControl
+class ConnectionsHubRandomSpotlight_WidgetShortcodeControl extends ConnectionsHub_WidgetShortcodeControl_Base
 {
 	/**
 	 * The minimum number of connection-link pairs for the random spotlight.

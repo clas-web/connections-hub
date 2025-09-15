@@ -80,6 +80,7 @@ require_once( CONNECTIONS_HUB_PLUGIN_PATH.'/functions.php' );
 require_once( CONNECTIONS_HUB_PLUGIN_PATH.'/classes/model/model.php' );
 require_once( CONNECTIONS_HUB_PLUGIN_PATH.'/classes/model/synch-model.php' );
 require_once( CONNECTIONS_HUB_PLUGIN_PATH.'/classes/custom-post-type/connection.php' );
+require_once( CONNECTIONS_HUB_PLUGIN_PATH.'/includes/class-widget-shortcode-control.php' );
 require_once( CONNECTIONS_HUB_PLUGIN_PATH.'/classes/random-spotlight/main.php' );
 require_once( CONNECTIONS_HUB_PLUGIN_PATH.'/classes/search/main.php' );
 
@@ -96,52 +97,30 @@ if( is_admin() )
 
 
 /**
- * Prevent activation if the Admin Page Library is not loaded or is not the correct version.
+ * Plugin activation hook - no longer requires APL.
  */
 if( !function_exists('conhub_activate_plugin') ):
 function conhub_activate_plugin()
 {
-	if( !defined('APL') || !defined('APL_VERSION') )
-	{
-		deactivate_plugins( plugin_basename( __FILE__ ) );
-		wp_die(
-			'The '.CONNECTIONS_HUB.' plugin requires the APL library.<br/>'.
-			'<a href="'.admin_url('plugins.php?deactivate=true').'">Return to Plugins</a>'
-		);
-	}
-	
-	if( version_compare(APL_VERSION, '1.0') < 0 )
-	{
-		deactivate_plugins( plugin_basename( __FILE__ ) );
-		wp_die(
-			'The '.CONNECTIONS_HUB.' plugin requires version 1.0 or greater of the APL library.<br/>'.
-			'<a href="'.admin_url('plugins.php?deactivate=true').'">Return to Plugins</a>'
-		);
-	}
+	// Plugin is now self-contained, no APL dependency required
 }
 endif;
 
 
 /**
  * Setup the admin pages.
+ * Admin pages are now APL-independent.
  */
 if( !function_exists('conhub_load') ):
 function conhub_load()
 {
 	require_once( __DIR__.'/admin-pages/require.php' );
-	
-	$conhub_pages = new APL_Handler( false );
-
+	$conhub_pages = new ConnectionsHub_AdminHandler();
 	$conhub_pages->add_page( new ConnectionsHub_ImportConnectionsAdminPage, 'edit.php?post_type=connection' );
 	$conhub_pages->add_page( new ConnectionsHub_ExportConnectionsAdminPage, 'edit.php?post_type=connection' );
 	$conhub_pages->add_page( new ConnectionsHub_SynchConnectionsAdminPage, 'edit.php?post_type=connection' );
 	$conhub_pages->add_page( new ConnectionsHub_SettingsAdminPage, 'edit.php?post_type=connection' );
 	$conhub_pages->setup();
-
-	if( $conhub_pages->controller )
-	{
-		add_action( 'admin_enqueue_scripts', 'conhub_admin_enqueue_scripts' );
-	}
 }
 endif;
 
